@@ -14,10 +14,10 @@ juce_add_plugin(Sinensis
     # VERSION ...                                     # Set this if the plugin version is different to the project version
     # ICON_BIG ""   # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
     #   ICON_SMALL "${CMAKE_SOURCE_DIR}/Assets/icon16.png " 
-    COMPANY_NAME "Tomoya Matsuura"                    # Specify the name of the plugin's author
-    COMPANY_COPYRIGHT "Tomoya Matsuura"
-    COMPANY_WEBSITE "https://matsuuratomoya.com/"
-    COMPANY_EMAIL "me@matsuuratomoya.com"
+    COMPANY_NAME "NOI"                    # Specify the name of the plugin's author
+    COMPANY_COPYRIGHT "NOI"
+    COMPANY_WEBSITE "https://lenomdesfleurs.github.io/Blog/"
+    COMPANY_EMAIL "Thomasvguillory@gmail.com"
     IS_SYNTH FALSE                       # Is this a synth or an effect?
     # NEEDS_MIDI_INPUT TRUE/FALSE               # Does the plugin need midi input?
     # NEEDS_MIDI_OUTPUT TRUE/FALSE              # Does the plugin need midi output?
