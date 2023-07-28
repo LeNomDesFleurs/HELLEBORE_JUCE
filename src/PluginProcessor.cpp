@@ -8,6 +8,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include <iostream>
 
 //==============================================================================
 HelleboreAudioProcessor::HelleboreAudioProcessor()
@@ -56,6 +57,8 @@ parameters(*this, nullptr, juce::Identifier("PARAMETERS"), {
     combTimeParameter = parameters.getRawParameterValue("comb_time");
     freezeParameter = parameters.getRawParameterValue("freeze");
     dryWetParameter = parameters.getRawParameterValue("dry_wet");
+    std::cout<<"successfull init";
+
 }
 
 HelleboreAudioProcessor::~HelleboreAudioProcessor()
@@ -65,7 +68,7 @@ HelleboreAudioProcessor::~HelleboreAudioProcessor()
 //==============================================================================
 const juce::String HelleboreAudioProcessor::getName() const
 {
-    return JucePlugin_Name;
+    // return JucePlugin_Name;
 }
 
 bool HelleboreAudioProcessor::acceptsMidi() const
@@ -173,21 +176,21 @@ void HelleboreAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 
     //retrieve param
     //Q
-    hellebore_parameters.variation = variationParameter->load();
-    //Number of band
-    hellebore_parameters.freeze = freezeParameter->load() > 1 ;
-    //Ratio
-    hellebore_parameters.dry_wet = dryWetParameter->load();
-    //frequence
-    hellebore_parameters.comb_time = combTimeParameter->load();
-    //link
-    hellebore_parameters.rt60 = timeParameter->load();
+    // hellebore_parameters.variation = variationParameter->load();
+    // //Number of band
+    // hellebore_parameters.freeze = freezeParameter->load() > 1 ;
+    // //Ratio
+    // hellebore_parameters.dry_wet = dryWetParameter->load();
+    // //frequence
+    // hellebore_parameters.comb_time = combTimeParameter->load();
+    // //link
+    // hellebore_parameters.rt60 = timeParameter->load();
     //band mode
    // sinensis_parameters.band_selector_mode = static_cast <int> (bandModeParameter->load());
     //hellebore_parameters.freeze = 0;
 
 
-    hellebore.updateParameters(hellebore_parameters);
+    // hellebore.updateParameters(hellebore_parameters);
 
 
 for (auto channel = 0; channel < buffer.getNumChannels(); ++channel) {
@@ -197,11 +200,10 @@ for (auto channel = 0; channel < buffer.getNumChannels(); ++channel) {
     auto RightChannelSamples = buffer.getWritePointer(1);
 
     for (auto n = 0; n < buffer.getNumSamples(); ++n) {
-        stereo_samples[0] = LeftChannelSamples[n];
-        stereo_samples[1] = RightChannelSamples[n];
-        stereo_samples = hellebore.processStereo(stereo_samples);
-        LeftChannelSamples[n] = stereo_samples[0];
-        RightChannelSamples[n] = stereo_samples[1];
+        ringBuffer.writeSample(RightChannelSamples[n]);
+        // stereo_samples = hellebore.processStereo(stereo_samples);
+        // LeftChannelSamples[n] = LeftChannelSamples[n];
+        RightChannelSamples[n] = ringBuffer.readSample();
 
     }
 
