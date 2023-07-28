@@ -10,7 +10,7 @@ else()
     message(STATUS "AAX Build is disabled. To enable, set AAX_SDK_PATH to your environment variable or specify -DAAX_SDK_PATH to CMake configure option.")
 endif()
 
-juce_add_plugin(ExamplePlugin
+juce_add_plugin(Sinensis
     # VERSION ...                                     # Set this if the plugin version is different to the project version
     # ICON_BIG ""   # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
     #   ICON_SMALL "${CMAKE_SOURCE_DIR}/Assets/icon16.png " 
@@ -46,12 +46,12 @@ juce_add_plugin(ExamplePlugin
     MICROPHONE_PERMISSION_ENABLED TRUE
     MICROPHONE_PERMISSION_TEXT "This applicaion requires a permission to use an audio input device of your computer. By Default, Built-In microphone will be used."
 
-    PRODUCT_NAME "ExamplePlugin")        # The name of the final 
+    PRODUCT_NAME "Sinensis")        # The name of the final 
 
-target_compile_features(ExamplePlugin PUBLIC cxx_std_17)
+target_compile_features(Sinensis PUBLIC cxx_std_17)
 
 
-target_compile_definitions(ExamplePlugin
+target_compile_definitions(Sinensis
     PUBLIC
     # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
     JUCE_WEB_BROWSER=0  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` call
@@ -65,12 +65,24 @@ SOURCES
 ${CMAKE_SOURCE_DIR}/assets/juce-logo.svg
 )
 
-target_sources(ExamplePlugin PRIVATE
-    PluginEditor.cpp
-    PluginProcessor.cpp
-)
+file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp") #"${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+target_sources(Sinensis PRIVATE ${SourceFiles})
 
-target_link_libraries(ExamplePlugin PUBLIC
+# target_sources(Sinensis PRIVATE
+#     # /*.cpp
+#     PluginEditor.cpp
+#     PluginProcessor.cpp
+#     LookAndFeel.cpp 
+#     MidiControl.cpp 
+#     ModeSelector.cpp 
+#     Q.cpp 
+#     Title.cpp 
+#     Sinensis.cpp 
+#     BandControl.cpp 
+    
+# )
+
+target_link_libraries(Sinensis PUBLIC
 JuceLogoBinary
 juce::juce_audio_basics
 juce::juce_audio_devices
@@ -90,4 +102,4 @@ juce::juce_opengl
 juce::juce_product_unlocking
 )
 
-juce_generate_juce_header(ExamplePlugin)
+juce_generate_juce_header(Sinensis)

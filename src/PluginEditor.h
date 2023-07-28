@@ -9,26 +9,45 @@
 #pragma once
 
 #include <JuceHeader.h>
-
 #include "PluginProcessor.h"
-
+#include "LookAndFeel.h"
+#include "PlaceHolder.h"
+#include "BandControl.h"
+#include "Title.h"
+#include "MidiControl.h"
+#include "Q.h"
 
 //==============================================================================
 /**
- */
-class TestpluginAudioProcessorEditor : public juce::AudioProcessorEditor {
- public:
-  TestpluginAudioProcessorEditor(TestpluginAudioProcessor &);
-  ~TestpluginAudioProcessorEditor() override;
+*/
+class SinensisAudioProcessorEditor  :   public juce::AudioProcessorEditor
+{
+public:
+    SinensisAudioProcessorEditor(SinensisAudioProcessor&, juce::AudioProcessorValueTreeState& vts);
+    //SinensisAudioProcessorEditor (SinensisAudioProcessor&);
+    ~SinensisAudioProcessorEditor() override;
 
-  //==============================================================================
-  void paint(juce::Graphics &) override;
-  void resized() override;
+    //==============================================================================
+    void paint (juce::Graphics&) override;
+    void resized() override;
 
- private:
-  // This reference is provided as a quick way for your editor to
-  // access the processor object that created it.
-  TestpluginAudioProcessor &audioProcessor;
-  std::unique_ptr<juce::Drawable> svgimg;
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TestpluginAudioProcessorEditor)
+private:
+
+    OtherLookAndFeel otherLookAndFeel; // [2]
+    SinensisAudioProcessor& audioProcessor;
+
+    QComponent Q { audioProcessor.parameters };
+    BandControl bandControl{ audioProcessor.parameters };
+    MidiControl midiMode{ audioProcessor.parameters };
+    Title title;
+
+
+    juce::Slider outputVolumeSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>outputVolumeAttachement;
+    juce::Label outputVolumeLabel;
+
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SinensisAudioProcessorEditor)
 };
+
+

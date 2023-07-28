@@ -6,40 +6,69 @@
   ==============================================================================
 */
 
+#include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-#include "PluginProcessor.h"
-
 //==============================================================================
-TestpluginAudioProcessorEditor::TestpluginAudioProcessorEditor(
-    TestpluginAudioProcessor &p)
+
+SinensisAudioProcessorEditor::SinensisAudioProcessorEditor(
+    SinensisAudioProcessor& p, juce::AudioProcessorValueTreeState& vts)
     : AudioProcessorEditor(&p), audioProcessor(p) {
-  // Make sure that before the constructor has finished, you've set the
-  // editor's size to whatever you need it to be.
-  setSize(400, 300);
-  // load Image from BinaryData
-  svgimg = juce::Drawable::createFromImageData(BinaryData::jucelogo_svg,
-                                               BinaryData::jucelogo_svgSize);
+    const int text_box_width = 50;
+    /*
+    //------------------------------------------------------
+    addAndMakeVisible(outputVolumeSlider);
+    outputVolumeSlider.setLookAndFeel(&otherLookAndFeel);
+    outputVolumeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    outputVolumeAttachement.reset(
+        new juce::AudioProcessorValueTreeState::SliderAttachment
+        (vts, "OUTPUTVOLUME", outputVolumeSlider));
+    outputVolumeSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, text_box_width, outputVolumeSlider.getTextBoxHeight());
+
+    //FrequencyStuff.setVisible(*vts.getRawParameterValue("MIDIMODE") == 0);
+    addAndMakeVisible(outputVolumeLabel);
+    outputVolumeLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+    outputVolumeLabel.setText("Out Volume",
+        juce::dontSendNotification);
+
+    //--------------------------------------------------------
+    */
+addAndMakeVisible(title);
+addAndMakeVisible(bandControl);
+addAndMakeVisible(Q);
+addAndMakeVisible(midiMode);
+
+    setSize(1200, 400);
 }
 
-TestpluginAudioProcessorEditor::~TestpluginAudioProcessorEditor() {}
+SinensisAudioProcessorEditor::~SinensisAudioProcessorEditor()
+{
+}
 
 //==============================================================================
-void TestpluginAudioProcessorEditor::paint(juce::Graphics &g) {
-  // (Our component is opaque, so we must completely fill the background with a
-  // solid colour)
-  g.fillAll(
-      getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
-  svgimg->drawWithin(g, getLocalBounds().toFloat(),
-                     juce::Justification::centred, 1);
+void SinensisAudioProcessorEditor::paint (juce::Graphics& g)
+{
+    // (Our component is opaque, so we must completely fill the background with a solid colour)
+   // g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
-  g.setColour(juce::Colours::black);
-  g.setFont(30.0f);
-  g.drawFittedText("Hello World!", getLocalBounds(),
-                   juce::Justification::centred, 1);
+    g.fillAll(juce::Colours::grey);
+    g.setColour (juce::Colours::black);
+    //g.setFont (15.0f);
+   //g.drawFittedText("Sinensis", 0, 0, getWidth(), 30, juce::Justification::centred, 1);
+
 }
 
-void TestpluginAudioProcessorEditor::resized() {
-  // This is generally where you'll want to lay out the positions of any
-  // subcomponents in your editor..
+void SinensisAudioProcessorEditor::resized()
+{
+    const int marge_haute_slider = 60;
+
+    auto bounds = getLocalBounds();
+
+    bounds.reduce(20, 20);
+
+    midiMode.setBounds(bounds.removeFromLeft(300));
+    title.setBounds(bounds.removeFromTop(100));
+    bandControl.setBounds(bounds.removeFromRight(600));
+    Q.setBounds(bounds);
+
 }
