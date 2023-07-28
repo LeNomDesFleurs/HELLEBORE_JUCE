@@ -2,11 +2,13 @@
   ==============================================================================
 
     Filter.h
-    Created: 28 Feb 2023 11:54:07am
+    Created: 11 Mar 2023 2:33:01pm
     Author:  thoma
 
   ==============================================================================
 */
+
+#pragma once
 
 #pragma once
 
@@ -18,107 +20,91 @@
 #include <string>
 #include <math.h>
 #include <vector>
-//#include "outils.hpp"
+#include "Outils.h"
+#include "Buffer.h"
 
 
-const float PI = 3.14159f;
 
 namespace noi {
 
-	namespace Filter {
-		class BPF {
+namespace Filter {
+	
+	class Allpass {
+	private:
+		noi::RingBuffer m_buffer{0.2};
+		float m_gain;
+		float m_looptime;
+	public:
+		inline Allpass(float time) {
+			m_buffer = noi::RingBuffer(time);
+			m_looptime = time;
+		}
+		inline void setReadSpeed(float ratio){
+			m_buffer.setStep(ratio);
+		} 
+		inline void setGain(float rt60) {
+			m_gain = -60. * m_looptime / rt60;
+			m_gain = powf(10.0, (m_gain / 20.0));
+		}
+		inline void overrideFeedback(float feedback){
+			m_gain = feedback;
+		}
+		inline float process(float input) {
+			float delay = m_buffer.read();
+			delay = noi::Outils::clipValue(delay, -1.f, 1.f);
+			float y = ((input + delay * m_gain) * (-m_gain)) + delay;
+			m_buffer.write(y);
+			return y;
+		}
+		inline void resize (float time){
+			m_buffer.computeStepSize(time);
+			m_looptime = time;
+		}
+	};
 
-		private:
-			//Parameters
-			float m_fc{ 0.0 };
-			float m_Q{ 0.0 };
-			//Previous Values Memory
-			float m_b[3]{ 0.0f, 0.0f , 0.0f };
-			float m_a[3]{ 0.0f, 0.0f, 0.0f };
-			//Biquad Coef
-			float m_b_gain[3]{ 0.0f, 0.0f, 0.0f };
-			float m_a_gain[3]{ 0.0f, 0.0f, 0.0f };
-			//Compute Values
-			float m_omega{0.0f};
-			float m_cosomega{ 0.0f };
-			float m_sinomega{ 0.0f };
-			float m_alpha{ 0.0f };
+	class Comb {
+	private:
+		float m_gain;
+		float m_looptime;
+		noi::RingBuffer m_buffer{2.f};
+	public:
+		inline Comb(float time) {
+			m_buffer = noi::RingBuffer(time);
+			m_looptime = time;
+		}
+		inline void setReadSpeed(float ratio){
+			m_buffer.setStep(ratio);
+		} 
+		inline void setGain(float rt60) {
+			m_gain = -60.f * m_looptime / rt60;
+			m_gain = powf(10.f, (m_gain / 20.f));
+		}
+		inline void overrideFeedback(float feedback){
+			m_gain = feedback;
+		}
+		inline float process(float input) {
+			float delay = m_buffer.read();
+			delay = noi::Outils::clipValue(delay, -1.f, 1.f);
+			float y = delay * m_gain + input;
+			m_buffer.write(y);
+			return y;
+		}
+		inline float processFreezed(){
+			return m_buffer.read();
+		}
+		inline void resize(float time){
+			//if (m_looptime == time){return;}
+			m_buffer.computeStepSize(time);
+			m_looptime = time;
+		}
+		inline void setFreeze(bool statut){
+			m_buffer.setFreeze(statut);
+		}
 
-			float m_sampling_frequency{ 48000.0 };
-
-		public:
-			inline BPF() {}
-			inline BPF(float freq, float Q) { setParam(freq, Q); }
-			//inline BPF() {}
-			inline void setSamplingFrequency(float sampling_frequency) {
-				m_sampling_frequency = sampling_frequency;
-			}
-			inline void computeBiquadCoef() {
-				m_a_gain[0] = 1 + m_alpha;
-
-				m_b_gain[0] = m_alpha * m_Q;
-				m_b_gain[0] /= m_a_gain[0];
-
-				m_b_gain[1] = 0;
-				m_b_gain[1] /= m_a_gain[0];
-
-				m_b_gain[2] = -m_Q * m_alpha;
-				m_b_gain[2] /= m_a_gain[0];
-
-				m_a_gain[1] = -2 * m_cosomega;
-				m_a_gain[1] /= m_a_gain[0];
-
-				m_a_gain[2] = 1 - m_alpha;
-				m_a_gain[2] /= m_a_gain[0];
-			}
-
-			inline void setParam(float frequence, float Q) {
-				if (m_fc == frequence && m_Q == Q) { return; }
-				m_fc = frequence;
-				m_Q = Q;
-				m_omega = 2.f * PI * (m_fc / 48000.f);
-				m_cosomega = cosf(m_omega);
-				m_sinomega = sinf(m_omega);
-				m_alpha = m_sinomega / (2 * m_Q);
-				computeBiquadCoef();
-			}
+	};/*Comb*/
 
 
-			inline float process(float b0) {
-				//feedback & clipping
-				float feedback = m_a[0];
-				//1500 choosed by experimentation w/ sinensis, self osc around Q = 38
-				feedback *= (m_Q / 1500.F);
-				if (feedback < -0.95) {
-					float overtaking = feedback + 0.95f;
-					feedback = -0.95f - (overtaking / 5.f);
-				}
-				if (feedback > 0.95f) {
-					float overtaking = feedback - 0.95f;
-					feedback = 0.95f + (overtaking / 5.f);
-				}
-				if (feedback > 1.0f) { feedback = 1.0f; }
-				if (feedback < -1.0f) { feedback =-1.0f; }
-				b0 += feedback;
-				//shift new value in
-				m_b[2] = m_b[1];
-				m_b[1] = m_b[0];
-				m_b[0] = b0;
-				m_a[2] = m_a[1];
-				m_a[1] = m_a[0];
-
-				m_a[0] = m_b[0] * m_b_gain[0]
-					+ m_b[1] * m_b_gain[1]
-					+ m_b[2] * m_b_gain[2]
-					- m_a[1] * m_a_gain[1]
-					- m_a[2] * m_a_gain[2];
-
-				return m_a[0];
-			}
-
-		};/*BPF*/
-
-	}/*Filter*/
+}/*Filter*/
 
 }/*noi*/
 

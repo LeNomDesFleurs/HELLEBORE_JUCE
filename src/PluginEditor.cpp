@@ -10,65 +10,122 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-
-SinensisAudioProcessorEditor::SinensisAudioProcessorEditor(
-    SinensisAudioProcessor& p, juce::AudioProcessorValueTreeState& vts)
-    : AudioProcessorEditor(&p), audioProcessor(p) {
-    const int text_box_width = 50;
-    /*
+HelleboreAudioProcessorEditor::HelleboreAudioProcessorEditor(
+    HelleboreAudioProcessor& p, juce::AudioProcessorValueTreeState& vts)
+    : AudioProcessorEditor (&p), audioProcessor (p)
+{
+    const float text_box_width = 50.0f;
     //------------------------------------------------------
-    addAndMakeVisible(outputVolumeSlider);
-    outputVolumeSlider.setLookAndFeel(&otherLookAndFeel);
-    outputVolumeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
-    outputVolumeAttachement.reset(
+    addAndMakeVisible(variationSlider);
+    variationSlider.setLookAndFeel(&otherLookAndFeel);
+    variationSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    variationAttachment.reset(
         new juce::AudioProcessorValueTreeState::SliderAttachment
-        (vts, "OUTPUTVOLUME", outputVolumeSlider));
-    outputVolumeSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, text_box_width, outputVolumeSlider.getTextBoxHeight());
+        (vts, "variation", variationSlider));
+    variationSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, text_box_width, 
+        variationSlider.getTextBoxHeight());
 
-    //FrequencyStuff.setVisible(*vts.getRawParameterValue("MIDIMODE") == 0);
-    addAndMakeVisible(outputVolumeLabel);
-    outputVolumeLabel.setColour(juce::Label::textColourId, juce::Colours::black);
-    outputVolumeLabel.setText("Out Volume",
+    addAndMakeVisible(variationLabel);
+    variationLabel.setText("variation",
         juce::dontSendNotification);
+    //-------------------------------------------------------
+    addAndMakeVisible(timeSlider);
+    timeSlider.setLookAndFeel(&otherLookAndFeel);
+    timeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    timeAttachment.reset(
+        new juce::AudioProcessorValueTreeState::SliderAttachment
+        (vts, "time", timeSlider));
+    timeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, text_box_width, timeSlider.getTextBoxHeight());
 
+
+    addAndMakeVisible(timeLabel);
+    timeLabel.setText("time", juce::dontSendNotification);
+    //-------------------------------------------------------
+    addAndMakeVisible(combSizeSlider);
+    combSizeSlider.setLookAndFeel(&otherLookAndFeel);
+    combSizeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    combSizeAttachement.reset(
+        new juce::AudioProcessorValueTreeState::SliderAttachment
+        (vts, "comb_time", combSizeSlider));
+    combSizeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, text_box_width, combSizeSlider.getTextBoxHeight());
+
+    addAndMakeVisible(combSizeLabel);
+    combSizeLabel.setText("Comb Size", juce::dontSendNotification);
+    //-------------------------------------------------------
+    addAndMakeVisible(dryWetSlider);
+    dryWetSlider.setLookAndFeel(&otherLookAndFeel);
+    dryWetSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    dryWetAttachement.reset(
+        new juce::AudioProcessorValueTreeState::SliderAttachment
+        (vts, "dry_wet", dryWetSlider));
+    dryWetSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, text_box_width, dryWetSlider.getTextBoxHeight());
+
+
+    addAndMakeVisible(dryWetLabel);
+    dryWetLabel.setText("DryWet", juce::dontSendNotification);
     //--------------------------------------------------------
-    */
-addAndMakeVisible(title);
-addAndMakeVisible(bandControl);
-addAndMakeVisible(Q);
-addAndMakeVisible(midiMode);
+    addAndMakeVisible(freezeSlider);
+    freezeSlider.setLookAndFeel(&otherLookAndFeel);
+    freezeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    freezeAttachement.reset(
+        new juce::AudioProcessorValueTreeState::SliderAttachment
+        (vts, "freeze", freezeSlider));
+    freezeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, text_box_width, freezeSlider.getTextBoxHeight());
 
-    setSize(1200, 400);
+
+    addAndMakeVisible(freezeLabel);
+    freezeLabel.setText("freeze", juce::dontSendNotification);
+
+    setSize(480, 190);
 }
 
-SinensisAudioProcessorEditor::~SinensisAudioProcessorEditor()
+HelleboreAudioProcessorEditor::~HelleboreAudioProcessorEditor()
 {
 }
 
 //==============================================================================
-void SinensisAudioProcessorEditor::paint (juce::Graphics& g)
+void HelleboreAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-   // g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll(juce::Colours::darkgrey);
+    g.setColour(juce::Colours::whitesmoke);
+    g.setFont(15.0f);
 
-    g.fillAll(juce::Colours::grey);
-    g.setColour (juce::Colours::black);
-    //g.setFont (15.0f);
-   //g.drawFittedText("Sinensis", 0, 0, getWidth(), 30, juce::Justification::centred, 1);
+    g.drawFittedText("Hellebore", 0, 0, getWidth(), 30, juce::Justification::centred, 1);
+
 
 }
 
-void SinensisAudioProcessorEditor::resized()
+void HelleboreAudioProcessorEditor::resized()
 {
     const int marge_haute_slider = 60;
 
-    auto bounds = getLocalBounds();
+    variationSlider.setBounds({ 10, marge_haute_slider, 100, 100 });
+    variationLabel.setBounds({ variationSlider.getX() ,
+                                    variationSlider.getY() - 30,
+                                    200, 50 });
 
-    bounds.reduce(20, 20);
+    timeSlider.setBounds({ 100, marge_haute_slider, 100, 100 });
+    timeLabel.setBounds({ timeSlider.getX() + 30,
+                                    timeSlider.getY() - 30,
+                                    200, 50 });
 
-    midiMode.setBounds(bounds.removeFromLeft(300));
-    title.setBounds(bounds.removeFromTop(100));
-    bandControl.setBounds(bounds.removeFromRight(600));
-    Q.setBounds(bounds);
+    combSizeSlider.setBounds({ 190, marge_haute_slider, 100, 100 });
+    combSizeLabel.setBounds({ combSizeSlider.getX() + 10,
+                                    combSizeSlider.getY() - 30,
+                                    200, 50 });
 
+    dryWetSlider.setBounds({ 275, marge_haute_slider, 100, 100 });
+    dryWetLabel.setBounds({ dryWetSlider.getX() + 10,
+                                    dryWetSlider.getY() - 30,
+                                    200, 50 });
+
+    freezeSlider.setBounds({ 360, marge_haute_slider, 100, 100 });
+    freezeLabel.setBounds({ freezeSlider.getX() + 10,
+                                    freezeSlider.getY() - 30,
+                                    200, 50 });
+
+
+    // This is generally where you'll want to lay out the positions of any
+    // subcomponents in your editor..
 }

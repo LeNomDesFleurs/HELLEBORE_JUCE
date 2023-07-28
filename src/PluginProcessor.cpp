@@ -8,11 +8,9 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include "Filter.h"
-
 
 //==============================================================================
-SinensisAudioProcessor::SinensisAudioProcessor()
+HelleboreAudioProcessor::HelleboreAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
 #if ! JucePlugin_IsMidiEffect
@@ -21,21 +19,56 @@ SinensisAudioProcessor::SinensisAudioProcessor()
 #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
 #endif
-        ), parameters(*this, nullptr, "PARAMETERS", createParams())
+        ),
+#else
+    :
 #endif
-    {}
+parameters(*this, nullptr, juce::Identifier("PARAMETERS"), {
+    std::make_unique<juce::AudioParameterFloat>(
+        "variation",
+        "Variation",
+        juce::NormalisableRange{0.f, 0.2f, 0.001f}, 0.1f),
 
-SinensisAudioProcessor::~SinensisAudioProcessor()
+    std::make_unique<juce::AudioParameterFloat>(
+        "time",
+        "Time",
+        juce::NormalisableRange{0.1f, 4.0f, 0.01f, 0.3f, false}, 2.0f),
+
+    std::make_unique<juce::AudioParameterFloat>(
+        "comb_time",
+        "Comb Time",
+        juce::NormalisableRange{0.010f, 1.0f, 0.001f, 0.3f, false}, 0.10f),
+
+    std::make_unique<juce::AudioParameterFloat>(
+        "freeze",
+        "Freeze",
+        juce::NormalisableRange{0.0f, 2.0f, 0.01f}, 0.0f) ,
+
+    std::make_unique<juce::AudioParameterFloat>(
+        "dry_wet",
+        "Dry Wet",
+        juce::NormalisableRange{0.0f, 1.0f, 0.01f}, 0.50f)
+    })
+
+{
+    variationParameter = parameters.getRawParameterValue("variation");
+    timeParameter = parameters.getRawParameterValue("time");
+    combTimeParameter = parameters.getRawParameterValue("comb_time");
+    freezeParameter = parameters.getRawParameterValue("freeze");
+    dryWetParameter = parameters.getRawParameterValue("dry_wet");
+}
+
+HelleboreAudioProcessor::~HelleboreAudioProcessor()
 {
 }
 
 //==============================================================================
-const juce::String SinensisAudioProcessor::getName() const
+const juce::String HelleboreAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
 
-bool SinensisAudioProcessor::acceptsMidi() const
+bool HelleboreAudioProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
     return true;
@@ -44,7 +77,7 @@ bool SinensisAudioProcessor::acceptsMidi() const
    #endif
 }
 
-bool SinensisAudioProcessor::producesMidi() const
+bool HelleboreAudioProcessor::producesMidi() const
 {
    #if JucePlugin_ProducesMidiOutput
     return true;
@@ -53,7 +86,7 @@ bool SinensisAudioProcessor::producesMidi() const
    #endif
 }
 
-bool SinensisAudioProcessor::isMidiEffect() const
+bool HelleboreAudioProcessor::isMidiEffect() const
 {
    #if JucePlugin_IsMidiEffect
     return true;
@@ -62,54 +95,50 @@ bool SinensisAudioProcessor::isMidiEffect() const
    #endif
 }
 
-double SinensisAudioProcessor::getTailLengthSeconds() const
+double HelleboreAudioProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
 
-int SinensisAudioProcessor::getNumPrograms()
+int HelleboreAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
                 // so this should be at least 1, even if you're not really implementing programs.
 }
 
-int SinensisAudioProcessor::getCurrentProgram()
+int HelleboreAudioProcessor::getCurrentProgram()
 {
     return 0;
 }
 
-void SinensisAudioProcessor::setCurrentProgram (int index)
+void HelleboreAudioProcessor::setCurrentProgram (int index)
 {
 }
 
-const juce::String SinensisAudioProcessor::getProgramName (int index)
+const juce::String HelleboreAudioProcessor::getProgramName (int index)
 {
     return {};
 }
 
-void SinensisAudioProcessor::changeProgramName (int index, const juce::String& newName)
+void HelleboreAudioProcessor::changeProgramName (int index, const juce::String& newName)
 {
 }
 
 //==============================================================================
-void SinensisAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
+void HelleboreAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    for (int channel = 0; channel < 2; channel++){
-            sinensis[channel].setSamplingFrequency(static_cast <float> (sampleRate));
-      
-    }
-    //sinensis.setSamplingFrequency(static_cast <float> (sampleRate));
-
+    // Use this method as the place to do any pre-playback
+    // initialisation that you need..
 }
 
-void SinensisAudioProcessor::releaseResources()
+void HelleboreAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool SinensisAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool HelleboreAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
     juce::ignoreUnused (layouts);
@@ -134,109 +163,80 @@ bool SinensisAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 }
 #endif
 
-void SinensisAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiBuffer)
+void HelleboreAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-
     juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
+    auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+        buffer.clear(i, 0, buffer.getNumSamples());
 
-    setParam();
+    //retrieve param
+    //Q
+    hellebore_parameters.variation = variationParameter->load();
+    //Number of band
+    hellebore_parameters.freeze = freezeParameter->load() > 1 ;
+    //Ratio
+    hellebore_parameters.dry_wet = dryWetParameter->load();
+    //frequence
+    hellebore_parameters.comb_time = combTimeParameter->load();
+    //link
+    hellebore_parameters.rt60 = timeParameter->load();
+    //band mode
+   // sinensis_parameters.band_selector_mode = static_cast <int> (bandModeParameter->load());
+    //hellebore_parameters.freeze = 0;
 
-   for (auto channel = 0; channel < 2; ++channel) {
-        // to access the sample in the channel as a C-style array
-        auto channelSamples = buffer.getWritePointer(channel);
 
-        // for each sample in the channel
-        for (auto n = 0; n < buffer.getNumSamples(); ++n) {
-            const auto input = channelSamples[n];
-            channelSamples[n] = sinensis[channel].processSinensis(input, midiBuffer);
-        }
+    hellebore.updateParameters(hellebore_parameters);
+
+
+for (auto channel = 0; channel < buffer.getNumChannels(); ++channel) {
+
+     // to access the sample in the channel as a C-style array
+    auto LeftChannelSamples = buffer.getWritePointer(0);
+    auto RightChannelSamples = buffer.getWritePointer(1);
+
+    for (auto n = 0; n < buffer.getNumSamples(); ++n) {
+        stereo_samples[0] = LeftChannelSamples[n];
+        stereo_samples[1] = RightChannelSamples[n];
+        stereo_samples = hellebore.processStereo(stereo_samples);
+        LeftChannelSamples[n] = stereo_samples[0];
+        RightChannelSamples[n] = stereo_samples[1];
+
     }
- 
+
+  }
+
 }
 
 //==============================================================================
-bool SinensisAudioProcessor::hasEditor() const
+bool HelleboreAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-juce::AudioProcessorEditor* SinensisAudioProcessor::createEditor()
+juce::AudioProcessorEditor* HelleboreAudioProcessor::createEditor()
 {
-    return new SinensisAudioProcessorEditor(*this, parameters);
+    return new HelleboreAudioProcessorEditor (*this, parameters);
 }
 
 //==============================================================================
-void SinensisAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+void HelleboreAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 }
 
-void SinensisAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void HelleboreAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
 }
 
 //==============================================================================
-
-juce::AudioProcessorValueTreeState::ParameterLayout SinensisAudioProcessor::createParams()
-{
-    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
-
-    params.push_back(std::make_unique<juce::AudioParameterChoice>("MIDIMODE", "Midi Mode", juce::StringArray{ "off", "mono", "poly" }, 0));
-    params.push_back(std::make_unique<juce::AudioParameterChoice>("BANDMODE", "Band Selector Mode", juce::StringArray{ "Low/High", "Odd/Even", "Peak" }, 0));
-   
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("root_frequency", "Root Frequency", juce::NormalisableRange{ 20.f, 20000.f, 0.1f, 0.2f, false }, 500.f)),
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("RATIO", "Ratio", juce::NormalisableRange{ 0.5f, 2.0f, 0.001f }, 1.5f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("RESONANCE","Resonance",juce::NormalisableRange{ 0.7f, 35.0f, 0.1f }, 20.0f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("band_selector", "Number Of Band", juce::NormalisableRange{ 0.0f, 1.0f, 0.01f }, 0.0f));
-    params.push_back(std::make_unique <juce::AudioParameterFloat>("OUTPUTVOLUME", "Ouput Volume", juce::NormalisableRange{ 0.0f, 2.0f, 0.01f }, 0.6f));
-
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("ATTACK", "Attack", juce::NormalisableRange<float> { 0.1f, 3.0f, 0.1f }, 0.4f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("DECAY", "Decay", juce::NormalisableRange<float> { 0.1f, 3.0f, 0.1f }, 0.4f));
-
-    params.push_back(std::make_unique<juce::AudioParameterBool>("MIDIOFF", "Midi Off", true));
-    params.push_back(std::make_unique<juce::AudioParameterBool>("MIDIMONO", "Midi Mono", false));
-    params.push_back(std::make_unique<juce::AudioParameterBool>("MIDIPOLY", "Midi Poly", false));
-
-    params.push_back(std::make_unique<juce::AudioParameterBool>("LOWHIGH", "Low / High", true));
-    params.push_back(std::make_unique<juce::AudioParameterBool>("ODDEVEN", "Odd / even", false));
-    params.push_back(std::make_unique<juce::AudioParameterBool>("PEAK", "Peak", false));
-
-    return { params.begin(), params.end() };
-}
-
-void SinensisAudioProcessor::setParam() {
-    //MODE
-    if (*parameters.getRawParameterValue("MIDIMONO")) sinensis_parameters.midi_mode = 1;
-    else if (*parameters.getRawParameterValue("MIDIPOLY")) sinensis_parameters.midi_mode = 2;
-    else sinensis_parameters.midi_mode = 0;
-
-    if (*parameters.getRawParameterValue("LOWHIGH")) sinensis_parameters.band_selector_mode = 0;
-    else if(*parameters.getRawParameterValue("ODDEVEN")) sinensis_parameters.band_selector_mode = 1;
-    else sinensis_parameters.band_selector_mode = 2;
-    //PARAM
-    sinensis_parameters.root_frequency = *parameters.getRawParameterValue("root_frequency");
-    sinensis_parameters.ratio = *parameters.getRawParameterValue("RATIO");
-    sinensis_parameters.resonance = *parameters.getRawParameterValue("RESONANCE");
-    sinensis_parameters.band_selector = *parameters.getRawParameterValue("band_selector");
-    sinensis_parameters.output_volume = *parameters.getRawParameterValue("OUTPUTVOLUME");
-    //ENVELOPPE
-    sinensis_parameters.attack = *parameters.getRawParameterValue("ATTACK");
-    sinensis_parameters.decay = *parameters.getRawParameterValue("DECAY");
-    //SET OBJECT
-    sinensis[0].setParameters(sinensis_parameters);
-    sinensis[1].setParameters(sinensis_parameters);
-}
-
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new SinensisAudioProcessor();
+    return new HelleboreAudioProcessor();
 }
