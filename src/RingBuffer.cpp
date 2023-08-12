@@ -19,10 +19,8 @@ RingBuffer::RingBuffer(int max_size, int initial_delay){
 float RingBuffer::readSample(){
 float read_sample = 0;
 m_read = m_read == m_buffer_size ? 0 : m_read + 1;
-if (m_read == 1000) std::cout<<m_buffer[m_read];
 read_sample = m_buffer[m_read];
-// return read_sample;
-return sample;
+return read_sample;
 }
 
 /// @brief increment write pointer and write input sample in buffer
@@ -30,6 +28,6 @@ return sample;
 void RingBuffer::writeSample(float input_sample){
     m_write = m_write == m_buffer_size ? 0 : m_write + 1;
     m_buffer[m_write] = input_sample;
-    sample = input_sample;
+    // m_buffer[0] = input_sample;
 }
 }

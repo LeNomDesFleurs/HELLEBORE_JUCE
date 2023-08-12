@@ -68,7 +68,7 @@ HelleboreAudioProcessor::~HelleboreAudioProcessor()
 //==============================================================================
 const juce::String HelleboreAudioProcessor::getName() const
 {
-    // return JucePlugin_Name;
+    return JucePlugin_Name;
 }
 
 bool HelleboreAudioProcessor::acceptsMidi() const
