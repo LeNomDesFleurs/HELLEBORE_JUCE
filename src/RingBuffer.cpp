@@ -1,4 +1,4 @@
-
+#include "Outils.h"
 #include "RingBuffer.hpp"
 #include <iostream>
 namespace noi{
@@ -60,5 +60,9 @@ void RingBuffer::writeSample(float input_sample){
     m_write = m_write == m_buffer_size ? 0 : m_write + 1;
     m_buffer[m_write] = input_sample;
     // m_buffer[0] = input_sample;
+}
+
+void RingBuffer::setStepSize(float step_size){
+    m_step_size = Outils::slewValue(step_size, m_step_size, 0.97);
 }
 }

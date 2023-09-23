@@ -11,7 +11,7 @@ void linearInterpolation();
 void noInterpolation();
 void allpassInterpolation();
 void incrementReadPointer();
-
+void setStepSize(float step_size);
 
 private:
 int m_sampling_frequency = 48000;
