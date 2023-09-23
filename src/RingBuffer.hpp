@@ -20,7 +20,7 @@ float m_read, m_write;
 int m_i_read;
 int m_i_read_next;
 float m_step_size = 1;
-int m_interpolation_mode = 1;
+int m_interpolation_mode = 2;
 //m_buffer_size en base 0
 int m_size_goal, m_actual_size, m_buffer_size;
 float sample;
