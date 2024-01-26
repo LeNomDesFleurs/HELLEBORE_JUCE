@@ -8,7 +8,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include <iostream>
+
 
 //==============================================================================
 HelleboreAudioProcessor::HelleboreAudioProcessor()
@@ -20,45 +20,9 @@ HelleboreAudioProcessor::HelleboreAudioProcessor()
 #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
 #endif
-        ),
-#else
-    :
+        )
 #endif
-parameters(*this, nullptr, juce::Identifier("PARAMETERS"), {
-    std::make_unique<juce::AudioParameterFloat>(
-        "variation",
-        "Variation",
-        juce::NormalisableRange{0.f, 0.2f, 0.001f}, 0.1f),
-
-    std::make_unique<juce::AudioParameterFloat>(
-        "time",
-        "Time",
-        juce::NormalisableRange{0.1f, 4.0f, 0.01f, 0.3f, false}, 2.0f),
-
-    std::make_unique<juce::AudioParameterFloat>(
-        "comb_time",
-        "Comb Time",
-        juce::NormalisableRange{0.010f, 1.0f, 0.001f, 0.3f, false}, 0.10f),
-
-    std::make_unique<juce::AudioParameterFloat>(
-        "freeze",
-        "Freeze",
-        juce::NormalisableRange{0.0f, 2.0f, 0.01f}, 0.0f) ,
-
-    std::make_unique<juce::AudioParameterFloat>(
-        "dry_wet",
-        "Dry Wet",
-        juce::NormalisableRange{0.0f, 1.0f, 0.01f}, 0.50f)
-    })
-
 {
-    variationParameter = parameters.getRawParameterValue("variation");
-    timeParameter = parameters.getRawParameterValue("time");
-    combTimeParameter = parameters.getRawParameterValue("comb_time");
-    freezeParameter = parameters.getRawParameterValue("freeze");
-    dryWetParameter = parameters.getRawParameterValue("dry_wet");
-    std::cout<<"successfull init";
-
 }
 
 HelleboreAudioProcessor::~HelleboreAudioProcessor()
@@ -68,7 +32,7 @@ HelleboreAudioProcessor::~HelleboreAudioProcessor()
 //==============================================================================
 const juce::String HelleboreAudioProcessor::getName() const
 {
-    return JucePlugin_Name;
+    return "hellebore";
 }
 
 bool HelleboreAudioProcessor::acceptsMidi() const
@@ -189,6 +153,9 @@ void HelleboreAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
    // sinensis_parameters.band_selector_mode = static_cast <int> (bandModeParameter->load());
     //hellebore_parameters.freeze = 0;
 
+  hellebore_parameters = getSettings(apvts);
+  hellebore.updateParameters(hellebore_parameters);
+
 
     // hellebore.updateParameters(hellebore_parameters);
 
@@ -198,17 +165,49 @@ for (auto channel = 0; channel < buffer.getNumChannels(); ++channel) {
      // to access the sample in the channel as a C-style array
     auto LeftChannelSamples = buffer.getWritePointer(0);
     auto RightChannelSamples = buffer.getWritePointer(1);
+    // auto sample = 
 
     for (auto n = 0; n < buffer.getNumSamples(); ++n) {
-        ringBuffer.writeSample(RightChannelSamples[n]);
-        // stereo_samples = hellebore.processStereo(stereo_samples);
-        // LeftChannelSamples[n] = LeftChannelSamples[n];
-        RightChannelSamples[n] = ringBuffer.readSample();
+      std::array<float, 2> stereo_samples = {LeftChannelSamples[n], RightChannelSamples[n]};
+      // ringBuffer.writeSample(RightChannelSamples[n]);
+      stereo_samples = hellebore.processStereo(stereo_samples);
 
+      LeftChannelSamples[n] = stereo_samples[0];
+      RightChannelSamples[n] = stereo_samples[1];
+
+      // LeftChannelSamples[n] = LeftChannelSamples[n];
+      // RightChannelSamples[n] = ringBuffer.readSample();
     }
 
   }
 
+}
+
+noi::StereoMoorer::Parameters getSettings(juce::AudioProcessorValueTreeState& apvts){
+  noi::StereoMoorer::Parameters settings;
+
+        settings.freeze = apvts.getRawParameterValue("freeze")->load() > 0.5;
+        settings.dry_wet = apvts.getRawParameterValue("dry_wet")->load();
+        settings.comb_time = apvts.getRawParameterValue("comb_time")->load();
+        settings.variation = apvts.getRawParameterValue("variation")->load();
+        settings.rt60 = apvts.getRawParameterValue("rt60")->load();
+
+        return settings;
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout HelleboreAudioProcessor::createParameterLayout(){
+
+juce::AudioProcessorValueTreeState::ParameterLayout layout;
+
+layout.add(std::make_unique<juce::AudioParameterFloat>("dry_wet", "dry_wet",
+juce::NormalisableRange<float>(0.f, 1.f, 0.01f, 1.f), 1.f));
+layout.add(std::make_unique<juce::AudioParameterFloat>("variation", "variation", juce::NormalisableRange<float>(0.f, 1.f, 0.1f, 1.f), 0.1));
+layout.add(std::make_unique<juce::AudioParameterFloat>("comb_time", "comb_time", juce::NormalisableRange<float>(0.f, 1.5f, 0.01f, 1.f), 1.f));
+layout.add(std::make_unique<juce::AudioParameterFloat>("rt60", "rt60", juce::NormalisableRange<float>(0.f, 20.f, 0.1f, 1.f), 5.f));
+layout.add(std::make_unique<juce::AudioParameterBool>("freeze", "freeze", false));
+
+
+return layout;
 }
 
 //==============================================================================
@@ -219,7 +218,9 @@ bool HelleboreAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* HelleboreAudioProcessor::createEditor()
 {
-    return new HelleboreAudioProcessorEditor (*this, parameters);
+    // return new HelleboreAudioProcessorEditor (*this, parameters);
+    //   return new TestpluginAudioProcessorEditor(*this);
+  return new GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================

@@ -9,8 +9,6 @@
 */
 
 #include "Hellebore.h"
-#include "Outils.h"
-#include <array>
 
 namespace noi {
 

@@ -68,19 +68,11 @@ ${CMAKE_SOURCE_DIR}/assets/juce-logo.svg
 file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp") #"${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 target_sources(Hellebore PRIVATE ${SourceFiles})
 
-# target_sources(Hellebore PRIVATE
-#     # /*.cpp
-#     PluginEditor.cpp
-#     PluginProcessor.cpp
-#     LookAndFeel.cpp 
-#     MidiControl.cpp 
-#     ModeSelector.cpp 
-#     Q.cpp 
-#     Title.cpp 
-#     Hellebore.cpp 
-#     BandControl.cpp 
-    
-# )
+target_sources(Hellebore PRIVATE
+    # /*.cpp
+    PluginEditor.cpp
+    PluginProcessor.cpp    
+)
 
 target_link_libraries(Hellebore PUBLIC
 JuceLogoBinary

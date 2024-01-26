@@ -15,7 +15,7 @@
     int m_goal_delay;
     int m_actual_delay;
     float m_feedback_ratio = 0.5;
-    RingBuffer m_buffer;
+    RingBuffer m_buffer {4, 2};
     float m_output_sample;
 
 

@@ -9,13 +9,16 @@
 #pragma once
 #include <JuceHeader.h>
 #include <array>
-// #include "Hellebore.h"
-#include "RingBuffer.hpp"
+#include "Hellebore.h"
+#include <iostream>
+
 
 
 //==============================================================================
 /**
 */
+noi::StereoMoorer::Parameters getSettings(juce::AudioProcessorValueTreeState& apvts);
+
 class HelleboreAudioProcessor  : public juce::AudioProcessor
                             #if JucePlugin_Enable_ARA
                              , public juce::AudioProcessorARAExtension
@@ -55,24 +58,19 @@ public:
     const juce::String getProgramName (int index) override;
     void changeProgramName (int index, const juce::String& newName) override;
 
+    static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    juce::AudioProcessorValueTreeState apvts {*this, nullptr, "Parameters", createParameterLayout()};
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
     //==============================================================================
-    // noi::StereoMoorer::Parameters hellebore_parameters{ false, 0.5F, 0.01f, 0.1f, 10.f };
-    // noi::StereoMoorer hellebore = noi::StereoMoorer(hellebore_parameters);
-    noi::RingBuffer ringBuffer = noi::RingBuffer(5, 2);
+    noi::StereoMoorer::Parameters hellebore_parameters{ false, 0.5F, 0.01f, 0.1f, 10.f };
+    noi::StereoMoorer hellebore = noi::StereoMoorer(hellebore_parameters);
+    // noi::RingBuffer ringBuffer = noi::RingBuffer(5, 2);
 
-    std::array<float, 2> stereo_samples = { 0, 0 };
-
-    juce::AudioProcessorValueTreeState parameters;
-    std::atomic <float>* variationParameter = nullptr;
-    std::atomic <float>* combTimeParameter = nullptr;
-    std::atomic <float>* timeParameter = nullptr;
-    std::atomic <float>* dryWetParameter = nullptr;
-    std::atomic <float>* freezeParameter = nullptr;
+    // std::array<float, 2> stereo_samples = { 0, 0 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HelleboreAudioProcessor)
 };

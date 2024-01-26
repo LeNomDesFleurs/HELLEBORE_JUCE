@@ -1,4 +1,8 @@
+#pragma once
+
 #include <vector>
+#include "Outils.h"
+#include <iostream>
 
 namespace noi{
 class RingBuffer{

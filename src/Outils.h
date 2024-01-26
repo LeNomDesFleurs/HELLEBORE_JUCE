@@ -10,8 +10,6 @@
 
 #pragma once
 
-#ifndef OUTILS
-#define OUTILS
 #include <vector>
 const float cheappi{ 3.14159265359 };
 
@@ -23,9 +21,9 @@ namespace noi {
 	/// @param old_value 
 	/// @param slew_factor a bigger slew factor means a slower change, must be <1 to keep stability
 	/// @return 
-	float slewValue(float new_value, float old_value, float slew_factor){
-	return (new_value * (1.0-slew_factor)) + (old_value * (slew_factor));
-	}
+	// float slewValue(float new_value, float old_value, float slew_factor){
+	// return (new_value * (1.0-slew_factor)) + (old_value * (slew_factor));
+	// }
 
 
 		inline float convertMsToSample(float time) { 
@@ -73,5 +71,3 @@ namespace noi {
 
 	}/*Outils*/
 }/*noi*/
-
-#endif /*OUTILS*/

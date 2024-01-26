@@ -18,11 +18,11 @@ namespace noi{
         return output_sample;
     }
 
-    DelayLine::updateLenght(){
+    void DelayLine::updateLenght(){
         
-        slewValue()
+    //     slewValue()
 
-    m_buffer.setStepSize();
+    // m_buffer.setStepSize();
     }
 
 }

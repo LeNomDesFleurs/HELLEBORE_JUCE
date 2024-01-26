@@ -1,6 +1,5 @@
-#include "Outils.h"
 #include "RingBuffer.hpp"
-#include <iostream>
+
 namespace noi{
 
 /// @brief constructor for ring buffer 

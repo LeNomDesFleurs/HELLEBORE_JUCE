@@ -10,10 +10,9 @@
 
 #pragma once
 
+#include <array>
 #include "Filter.h"
 #include <vector>
-#include <array>
-
 namespace noi {
 
 		class StereoMoorer {
