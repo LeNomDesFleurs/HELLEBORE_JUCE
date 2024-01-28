@@ -15,7 +15,11 @@ namespace noi {
 
 namespace Filter {
 	
-Filter::Filter
+// Filter::Filter(float time){
+//     m_buffer = noi::RingBuffer(time);
+// 	m_looptime = time;
+// }
+
 void Filter::setReadSpeed(float ratio){
 m_buffer.setStepSize(ratio);
 } 
@@ -45,6 +49,11 @@ float Filter::processFreezed(){
 	return m_buffer.readSample();
 }
 
+Allpass::Allpass(float time){
+    m_buffer = noi::RingBuffer(time);
+	m_looptime = time;
+}
+
 float Allpass::process(float input){
     float delay = m_buffer.readSample();
     delay = noi::Outils::clipValue(delay, -1.f, 1.f);
@@ -54,7 +63,10 @@ float Allpass::process(float input){
   }
 
 
-Comb::Comb()
+Comb::Comb(float time){
+    m_buffer = noi::RingBuffer(time);
+	m_looptime = time;
+}
 
 float Comb::process(float input) {
 	float delay = m_buffer.readSample();

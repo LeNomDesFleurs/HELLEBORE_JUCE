@@ -7,8 +7,9 @@
 namespace noi{
 class RingBuffer{
 public:
-RingBuffer(int max_size, int initial_delay);
+RingBuffer(int max_size, int initial_delay, double _sample_rate);
 RingBuffer(float max_size);
+RingBuffer();
 float readSample();
 void writeSample(float input_sample);
 float interpolateSample();
@@ -23,7 +24,7 @@ void setSampleRate(float sample_rate);
 
 private:
  enum InterpolationMode { none, linear, allpass };
- InterpolationMode interpolation_mode = linear;
+ InterpolationMode interpolation_mode = allpass;
  int sample_rate = 48000;
  std::vector<float> m_buffer;
  float m_read, m_write;
@@ -31,7 +32,8 @@ private:
  int m_i_read_next;
  float m_step_size = 1;
  // m_buffer_size en base 0
- int m_size_goal, m_actual_size, m_buffer_size;
+ int m_size_goal, m_buffer_size;
+ float m_actual_size;
  float sample;
  float m_frac;
  float m_output_sample;

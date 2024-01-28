@@ -24,7 +24,7 @@ namespace Filter {
 
 	class Filter{
 		public:
-          Filter(float time);
+        //   Filter(float time);
           void setReadSpeed(float ratio);
           void setGain(float rt60);
           void overrideFeedback(float feedback);

@@ -94,8 +94,10 @@ void HelleboreAudioProcessor::changeProgramName (int index, const juce::String& 
 //==============================================================================
 void HelleboreAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+  ringBuffer = noi::RingBuffer(4, 3, sampleRate);
+
+  // Use this method as the place to do any pre-playback
+  // initialisation that you need..
 }
 
 void HelleboreAudioProcessor::releaseResources()
@@ -138,48 +140,36 @@ void HelleboreAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    //retrieve param
-    //Q
-    // hellebore_parameters.variation = variationParameter->load();
-    // //Number of band
-    // hellebore_parameters.freeze = freezeParameter->load() > 1 ;
-    // //Ratio
-    // hellebore_parameters.dry_wet = dryWetParameter->load();
-    // //frequence
-    // hellebore_parameters.comb_time = combTimeParameter->load();
-    // //link
-    // hellebore_parameters.rt60 = timeParameter->load();
-    //band mode
-   // sinensis_parameters.band_selector_mode = static_cast <int> (bandModeParameter->load());
-    //hellebore_parameters.freeze = 0;
 
-  // hellebore_parameters = getSettings(apvts);
+  hellebore_parameters = getSettings(apvts);
+  hellebore.updateParameters(hellebore_parameters);
+  // ringBuffer.setDelayTime(hellebore_parameters.comb_time * 1000);
+
   // hellebore.updateParameters(hellebore_parameters);
 
-
-    // hellebore.updateParameters(hellebore_parameters);
-
-
-for (auto channel = 0; channel < buffer.getNumChannels(); ++channel) {
-
-     // to access the sample in the channel as a C-style array
+  // for (auto channel = 0; channel < buffer.getNumChannels(); ++channel) {
+    // to access the sample in the channel as a C-style array
     auto LeftChannelSamples = buffer.getWritePointer(0);
     auto RightChannelSamples = buffer.getWritePointer(1);
     // auto sample = 
 
     for (auto n = 0; n < buffer.getNumSamples(); ++n) {
       std::array<float, 2> stereo_samples = {LeftChannelSamples[n], RightChannelSamples[n]};
-      // ringBuffer.writeSample(RightChannelSamples[n]);
       stereo_samples = hellebore.processStereo(stereo_samples);
+
+      // ringBuffer.writeSample(LeftChannelSamples[n]);
+
+      // LeftChannelSamples[n] = ringBuffer.readSample();
 
       LeftChannelSamples[n] = stereo_samples[0];
       RightChannelSamples[n] = stereo_samples[1];
 
+      // ringBuffer.writeSample(RightChannelSamples[n]);
       // LeftChannelSamples[n] = LeftChannelSamples[n];
       // RightChannelSamples[n] = ringBuffer.readSample();
     }
 
-  }
+  // }
 
 }
 

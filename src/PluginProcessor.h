@@ -69,8 +69,7 @@ private:
     //==============================================================================
     noi::StereoMoorer::Parameters hellebore_parameters{ false, 0.5F, 0.01f, 0.1f, 10.f };
     noi::StereoMoorer hellebore = noi::StereoMoorer(hellebore_parameters);
-    noi::RingBuffer ringBuffer = noi::RingBuffer(4, 2);
-
+    noi::RingBuffer ringBuffer;
     // std::array<float, 2> stereo_samples = { 0, 0 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HelleboreAudioProcessor)
