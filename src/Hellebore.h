@@ -11,7 +11,7 @@
 #pragma once
 
 #include <array>
-#include "Filter.h"
+#include "Filter.hpp"
 #include <vector>
 namespace noi {
 

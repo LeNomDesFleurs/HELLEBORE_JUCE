@@ -1,4 +1,5 @@
- 
+#pragma once
+
 #include "RingBuffer.hpp"
 
  namespace noi{
@@ -12,8 +13,8 @@
 
 
     private:
-    int m_goal_delay;
-    int m_actual_delay;
+    float m_goal_delay;
+    float m_actual_delay;
     float m_feedback_ratio = 0.5;
     RingBuffer m_buffer {4, 2};
     float m_output_sample;

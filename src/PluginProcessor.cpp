@@ -153,8 +153,8 @@ void HelleboreAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
    // sinensis_parameters.band_selector_mode = static_cast <int> (bandModeParameter->load());
     //hellebore_parameters.freeze = 0;
 
-  hellebore_parameters = getSettings(apvts);
-  hellebore.updateParameters(hellebore_parameters);
+  // hellebore_parameters = getSettings(apvts);
+  // hellebore.updateParameters(hellebore_parameters);
 
 
     // hellebore.updateParameters(hellebore_parameters);

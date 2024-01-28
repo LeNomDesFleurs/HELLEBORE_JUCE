@@ -8,10 +8,7 @@
   ==============================================================================
 */
 
-#pragma once
-
-#include <vector>
-const float cheappi{ 3.14159265359 };
+#include "Outils.hpp"
 
 namespace noi {
 
@@ -21,36 +18,41 @@ namespace noi {
 	/// @param old_value 
 	/// @param slew_factor a bigger slew factor means a slower change, must be <1 to keep stability
 	/// @return 
-	// float slewValue(float new_value, float old_value, float slew_factor){
-	// return (new_value * (1.0-slew_factor)) + (old_value * (slew_factor));
-	// }
+	    
+        float slewValue(float new_value, float old_value, float slew_factor){
+	    return (new_value * (1.0-slew_factor)) + (old_value * (slew_factor));
+	    }
 
 
-		inline float convertMsToSample(float time) { 
-			float temp = truncf(48000.f * time); 
+		/// @brief convert milliseconds to samples
+		/// @param time in seconds
+        /// @param sample_rate sample / secondes in Hz
+		/// @return 
+		float convertMsToSample(float time, float sample_rate) { 
+			float temp = (sample_rate/1000.f) * time; 
 			return temp; }
 	
-		inline int mapValueFloatToInt(float inMin, float inMax, float value, int outMin, int outMax) {
+		int mapValueFloatToInt(float inMin, float inMax, float value, int outMin, int outMax) {
 			float ratio = ((outMax - outMin) / (inMax - inMin));
 			float offset{ outMin - (inMin * ratio) };
 			int output = static_cast<int> (value * ratio + offset);
 			return output;
 		}
 
-		inline float mapValue(float value, float inMin, float inMax, float outMin, float outMax) {
+		float mapValue(float value, float inMin, float inMax, float outMin, float outMax) {
 			float ratio{ (outMax - outMin) / (inMax - inMin) };
 			float offset{ outMin - (inMin * ratio) };
 			float output{ value * ratio + offset };
 			return output;
 		}
 		
-		inline float clipValue(float value, float min, float max) {
+		float clipValue(float value, float min, float max) {
 			if (value > max) value = max;
 			if (value < min) value = min;
 			return value;
 		}
-
-		inline float spliter(float target, float state, float diff) {
+		
+        float spliter(float target, float state, float diff) {
 			if (state < target) { state += (target - state) * 2; }
 			float slope = 0 - (1 / diff);
 			state -= target;
@@ -58,12 +60,13 @@ namespace noi {
 			if (coef < 0) { return 0; }
 			else return coef;
 		}
+
 		/// @brief take two signals and return the linear crossfade
 		/// @param dry signal
 		/// @param wet signal
 		/// @param parameter 0 full dry / 1 full wet
 		/// @return 
-		inline float dryWet(float dry, float wet, float parameter){
+		float dryWet(float dry, float wet, float parameter){
 			return (dry * (1.0 - parameter)) + (wet * parameter);
 		}
 	
