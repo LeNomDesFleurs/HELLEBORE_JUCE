@@ -74,11 +74,26 @@ float linearCrossfade(float dry, float wet, float parameter) {
 }
 
 float equalPowerCrossfade(float dry, float wet, float parameter) {
+  parameter = 1. - parameter;
   parameter = (parameter - 0.5) * 2;
   float volumes_dry = std::sqrtf(0.5f * (1.f + parameter));
   float volumes_wet = std::sqrtf(0.5f * (1.f - parameter));
   return (dry * volumes_dry) + (wet * volumes_wet);
 }
 
+float TriangleWave::getNextSample() {
+  phasor();
+  // shaping
+  return (std::abs(m_status - 0.5) * 4) - 1;
+}
+
+void TriangleWave::phasor() {
+  m_status += m_frequence / m_sample_rate;
+  if (m_status > 1) m_status = 0;
+}
+TriangleWave::TriangleWave(float sampleRate, float frequence) {
+  m_sample_rate = sampleRate;
+  m_frequence = frequence;
+}
 }  // namespace Outils
 }  // namespace noi

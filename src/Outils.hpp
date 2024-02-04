@@ -52,5 +52,17 @@ float linearCrossfade(float dry, float wet, float parameter);
 /// @return Sum of weighted dry and wet
 float equalPowerCrossfade(float dry, float wet, float parameter);
 
+class TriangleWave {
+ public:
+  float m_status;
+  float m_sample_rate;
+  float m_frequence;
+
+  TriangleWave(float sampleRate, float frequence);
+  float getNextSample();
+  void phasor();
+  void setFrequency(float frequency) { m_frequence = frequency; }
+};
+
 }  // namespace Outils
 }  // namespace noi
