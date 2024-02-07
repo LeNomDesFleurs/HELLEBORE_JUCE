@@ -23,7 +23,7 @@ class RingBuffer {
   void setDelayTime(float delay_time);
   void updateStepSize();
   void freezedUpdateStepSize();
-  void setSampleRate(float sample_rate);
+  void setSampleRate(float _sample_rate);
   void setFreezed(bool _freezed);
   void checkForReadIndexOverFlow();
   /// @brief Split read index in m_i_read (previous sample) m_i_read_next (next

@@ -19,7 +19,7 @@ HelleboreAudioProcessorEditor::HelleboreAudioProcessorEditor(
   // dryWetSlider};
   apvts = &vts;
   //------------------------------------------------------
-  variationSlider.setLookAndFeel(&otherLookAndFeel);
+  variationSlider.setLookAndFeel(&centricKnob);
   variationSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   variationAttachment.reset(
       new juce::AudioProcessorValueTreeState::SliderAttachment(
@@ -30,7 +30,7 @@ HelleboreAudioProcessorEditor::HelleboreAudioProcessorEditor(
 
   variationLabel.setText("variation", juce::dontSendNotification);
   //-------------------------------------------------------
-  timeSlider.setLookAndFeel(&otherLookAndFeel);
+  timeSlider.setLookAndFeel(&centricKnob);
   timeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   timeAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(
       vts, "rt60", timeSlider));
@@ -39,7 +39,7 @@ HelleboreAudioProcessorEditor::HelleboreAudioProcessorEditor(
 
   timeLabel.setText("time", juce::dontSendNotification);
   //-------------------------------------------------------
-  combSizeSlider.setLookAndFeel(&otherLookAndFeel);
+  combSizeSlider.setLookAndFeel(&centricKnob);
   combSizeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   combSizeAttachement.reset(
       new juce::AudioProcessorValueTreeState::SliderAttachment(vts, "comb_time",
@@ -50,7 +50,7 @@ HelleboreAudioProcessorEditor::HelleboreAudioProcessorEditor(
 
   combSizeLabel.setText("Comb Size", juce::dontSendNotification);
   //-------------------------------------------------------
-  dryWetSlider.setLookAndFeel(&otherLookAndFeel);
+  dryWetSlider.setLookAndFeel(&centricKnob);
   dryWetSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   dryWetAttachement.reset(
       new juce::AudioProcessorValueTreeState::SliderAttachment(vts, "dry_wet",
@@ -60,7 +60,7 @@ HelleboreAudioProcessorEditor::HelleboreAudioProcessorEditor(
 
   dryWetLabel.setText("DryWet", juce::dontSendNotification);
   //--------------------------------------------------------
-  freezeSlider.setLookAndFeel(&otherLookAndFeel);
+  freezeSlider.setLookAndFeel(&centricKnob);
   freezeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   freezeAttachement.reset(
       new juce::AudioProcessorValueTreeState::SliderAttachment(vts, "freeze",
@@ -81,6 +81,13 @@ HelleboreAudioProcessorEditor::HelleboreAudioProcessorEditor(
   }
   startTimerHz(30);
   setSize(480, 500);
+
+  int random_order[12] = {1, 5, 8, 7, 11, 3, 12, 2, 10, 6, 9, 3};
+
+  for (int i = 0; i < 12; i++) {
+    float phase = i / 12.;
+    lfos[random_order[i]].setPhase(phase);
+  }
 }
 
 HelleboreAudioProcessorEditor::~HelleboreAudioProcessorEditor() {
@@ -98,18 +105,23 @@ void HelleboreAudioProcessorEditor::paint(juce::Graphics& g) {
   g.setColour(juce::Colour(89, 106, 55));
   g.setFont(15.0f);
   // g.
-  float centerx = 200;
-  float centery = 200;
+  float centerx = 240;
+  float centery = 300;
 
   //   float rotation[12] =
 
   for (int i = 0; i < 12; i++) {
-    float rotation = (cheappi / 6) * i;
-    float max_far = i * 3;
-    if (i > 5) {
-      max_far = -max_far;
+    float rotation = (cheappi / 12) * i;
+
+    if (!freeze) {
+      rotation_status = rotationLfo.getNextSample();
     }
-    float far = max_far * variation * ((lfos[i].getNextSample() + 1) * 2);
+    rotation += cheappi * rotation_status;
+    float max_far = 10 + (i * 3);
+    // if (i > 5) {
+    //   max_far = -max_far;
+    // }
+    float far = max_far * variation * ((lfos[i].getNextSample()) * 2);
 
     float opp = std::sin(rotation) * far;
     float adj = std::cos(rotation) * far;
@@ -174,11 +186,14 @@ void HelleboreAudioProcessorEditor::parameterValueChanged(int parameterIndex,
                                                           float newValue) {
   parametersChanged.set(true);
   switch (parameterIndex) {
-    case 1:
-      elipseSize = newValue;
-      break;
     case 2:
-      variation = newValue;
+      elipseSize = newValue * 4 + 4;
+      break;
+    case 1:
+      variation = newValue * 1.5;
+      break;
+    case 4:
+      freeze = newValue > 0.5;
       break;
   }
 }

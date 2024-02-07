@@ -12,61 +12,9 @@
 
 #include <cmath>
 
+#include "LookAndFeel.hpp"
 #include "PluginProcessor.h"
 
-class OtherLookAndFeel : public juce::LookAndFeel_V4 {
- public:
-  OtherLookAndFeel() {
-    setColour(juce::Slider::thumbColourId, juce::Colours::red);
-  }
-  //! [otherLookAndFeel]
-
-  //! [drawRotarySlider]
-  void drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
-                        float sliderPos, const float rotaryStartAngle,
-                        const float rotaryEndAngle, juce::Slider&) override
-  //! [drawRotarySlider]
-  {
-    //! [locals]
-    auto radius = (float)juce::jmin(width / 2, height / 2) - 10.0f;
-    auto centreX = (float)x + (float)width * 0.5f;
-    auto centreY = (float)y + (float)height * 0.5f;
-    auto rx = centreX - radius;
-    auto ry = centreY - radius;
-    auto rw = radius * 2.0f;
-    auto angle =
-        rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
-    //! [locals]
-
-    //! [outline]
-    // fill
-    // g.setColour(juce::Colours::whitesmoke);
-    // g.fillEllipse(rx, ry, rw, rw);
-
-    // outline
-    g.setColour(juce::Colours::black);
-    g.drawEllipse(rx, ry, rw, rw, 15.0f);
-    //! [outline]
-
-    //! [path]
-    juce::Path p;
-    auto pointerLength = radius * 0.33f;
-    auto pointerThickness = 7.0f;
-
-    p.addEllipse(-pointerThickness * 0.5f + 2.0f, -radius, pointerThickness,
-                 pointerThickness);
-
-    // p.applyTransform(
-    //     juce::AffineTransform::rotation(angle).translated(centreX, centreY));
-    //! [path]
-
-    //! [pointer]
-    // pointer
-    g.setColour(juce::Colours::white);
-    g.fillPath(p);
-    //! [pointer]
-  }
-};
 //==============================================================================
 /**
  */
@@ -94,9 +42,11 @@ class HelleboreAudioProcessorEditor
   // access the processor object that created it.
   HelleboreAudioProcessor& audioProcessor;
 
+  CentricKnob centricKnob;
+
   juce::Atomic<bool> parametersChanged{false};
 
-  OtherLookAndFeel otherLookAndFeel;  // [2]
+  //   OtherLookAndFeel otherLookAndFeel;  // [2]
 
   juce::Slider variationSlider;
   std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
@@ -128,6 +78,8 @@ class HelleboreAudioProcessorEditor
   // entre 0 et 1
   float variation = 0;
 
+  bool freeze = false;
+
   std::array<noi::Outils::TriangleWave, 12> lfos = {
       noi::Outils::TriangleWave(60, 0.2), noi::Outils::TriangleWave(60, 0.2),
       noi::Outils::TriangleWave(60, 0.2), noi::Outils::TriangleWave(60, 0.2),
@@ -136,6 +88,8 @@ class HelleboreAudioProcessorEditor
       noi::Outils::TriangleWave(60, 0.2), noi::Outils::TriangleWave(60, 0.2),
       noi::Outils::TriangleWave(60, 0.2), noi::Outils::TriangleWave(60, 0.2)};
 
+  noi::Outils::SawTooth rotationLfo{60.f, 0.03};
+  float rotation_status;
   AudioProcessorValueTreeState* apvts;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HelleboreAudioProcessorEditor)

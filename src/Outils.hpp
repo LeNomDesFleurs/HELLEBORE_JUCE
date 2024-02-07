@@ -52,16 +52,30 @@ float linearCrossfade(float dry, float wet, float parameter);
 /// @return Sum of weighted dry and wet
 float equalPowerCrossfade(float dry, float wet, float parameter);
 
-class TriangleWave {
+class LFO {
  public:
   float m_status;
   float m_sample_rate;
   float m_frequence;
 
-  TriangleWave(float sampleRate, float frequence);
-  float getNextSample();
+  LFO(float sampleRate, float frequence);
   void phasor();
   void setFrequency(float frequency) { m_frequence = frequency; }
+  /// @brief
+  /// @param phase between 0 and 1
+  void setPhase(float phase) { m_status = phase; }
+  virtual float getNextSample() = 0;
+};
+class TriangleWave : public LFO {
+ public:
+  using LFO::LFO;
+  float getNextSample() override;
+};
+
+class SawTooth : public LFO {
+ public:
+  using LFO::LFO;
+  float getNextSample() override;
 };
 
 }  // namespace Outils

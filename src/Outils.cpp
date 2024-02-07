@@ -81,19 +81,26 @@ float equalPowerCrossfade(float dry, float wet, float parameter) {
   return (dry * volumes_dry) + (wet * volumes_wet);
 }
 
+LFO::LFO(float sampleRate, float frequence) {
+  m_sample_rate = sampleRate;
+  m_frequence = frequence;
+}
+
+void LFO::phasor() {
+  m_status += m_frequence / m_sample_rate;
+  if (m_status > 1) m_status = 0;
+}
+
 float TriangleWave::getNextSample() {
   phasor();
   // shaping
   return (std::abs(m_status - 0.5) * 4) - 1;
 }
 
-void TriangleWave::phasor() {
-  m_status += m_frequence / m_sample_rate;
-  if (m_status > 1) m_status = 0;
+float SawTooth::getNextSample() {
+  phasor();
+  return (m_status - 0.5) * 2;
 }
-TriangleWave::TriangleWave(float sampleRate, float frequence) {
-  m_sample_rate = sampleRate;
-  m_frequence = frequence;
-}
+
 }  // namespace Outils
 }  // namespace noi

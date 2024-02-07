@@ -28,6 +28,8 @@ RingBuffer::RingBuffer(float max_size) {
   m_buffer_size--;
   m_write = m_buffer_size / 2.f;
   m_read = 0;
+  m_actual_size = m_write;
+  m_size_goal = m_actual_size;
 }
 
 /// @brief increment pointer and set its int, incremented int and frac value
@@ -50,8 +52,8 @@ float RingBuffer::readSample() {
     freezeIncrementReadPointer();
     freezedUpdateStepSize();
   } else {
-    incrementReadPointer();
     updateStepSize();
+    incrementReadPointer();
   }
 
   fractionalizeReadIndex();
@@ -106,23 +108,30 @@ void RingBuffer::setStepSize(float step_size) { m_step_size = step_size; }
 void RingBuffer::updateStepSize() {
   float correction_offset;
   if (m_actual_size > (m_size_goal - 5) && m_actual_size < (m_size_goal + 5)) {
-    correction_offset = 1.0;
+    m_step_size = 1.0;
   } else if (m_actual_size > m_size_goal) {
-    correction_offset = 0.5;
+    m_step_size = 1.5;
+    m_actual_size -= 0.5;
     // update the step size but with slew for clean repitch
   } else if (m_actual_size < m_size_goal) {
-    correction_offset = 1.5;
+    m_step_size = 0.5;
+    m_actual_size += 0.5;
   }
 
-  m_step_size = noi::Outils::slewValue(correction_offset, m_step_size, 0.999);
+  // m_step_size = noi::Outils::slewValue(correction_offset, m_step_size,
+  // 0.999);
+
+  // if (m_step_size > 0.999 && m_step_size < 1.0001) {
+  //   m_step_size = 1.0;
+  // }
 
   // if (!freezed){
-  if (m_step_size > 1) {
-    m_actual_size += m_step_size - 1;
+  // if (m_step_size > 1) {
+  //   m_actual_size -= m_step_size - 1;
 
-  } else if (m_step_size < 1) {
-    m_actual_size -= 1 - m_step_size;
-  }
+  // } else if (m_step_size < 1) {
+  //   m_actual_size += 1 - m_step_size;
+  // }
   // update the step size and update the actual delay time
   // }
 }
@@ -137,7 +146,9 @@ void RingBuffer::setDelayTime(float delay_time) {
   m_size_goal = noi::Outils::clipValue(delay_in_samples, 4, m_buffer_size - 4);
 }
 
-void RingBuffer::setSampleRate(float sample_rate) { sample_rate = sample_rate; }
+void RingBuffer::setSampleRate(float _sample_rate) {
+  sample_rate = _sample_rate;
+}
 
 void RingBuffer::setFreezed(bool _freezed) {
   // avoid updating the m_size_on_freeze

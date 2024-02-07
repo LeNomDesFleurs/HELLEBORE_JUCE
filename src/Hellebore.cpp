@@ -42,17 +42,17 @@ void StereoMoorer::setTime() {
   float variation = m_parameters.variation + 1.f;
   for (int i = 0; i < 2; i++) {
     m_allpasses[i].setGain(rt60);
-    for (auto& comb : m_combs[i]) {
-      comb.setGain(rt60);
-      rt60 *= variation;
+    for (int j = 0; j < 6; j++) {
+      m_combs[i][j].setGain(rt60);
+      ;
     }
   }
 }
 
 void StereoMoorer::setFreeze() {
   for (int i = 0; i < 2; i++) {
-    for (auto& combs : m_combs[i]) {
-      combs.setFreeze(m_parameters.freeze);
+    for (int j = 0; j < 6; j++) {
+      m_combs[i][j].setFreeze(m_parameters.freeze);
     }
     for (auto& allpases : m_allpasses) {
       allpases.setFreeze(m_parameters.freeze);
@@ -65,9 +65,19 @@ void StereoMoorer::resizeComb() {
   float variation = m_parameters.variation + 1.f;
   for (int i = 0; i < 2; i++) {
     float time = m_parameters.comb_time;
-    for (auto& comb : m_combs[i]) {
-      comb.resize(time);
-      time *= variation;
+    for (int j = 0; j < 6; j++) {
+      m_combs[i][j].resize(time);
+      time += time * (variation / 10.);
+    }
+  }
+}
+
+void StereoMoorer::setSampleRate(float sample_rate) {
+  for (int i = 0; i < 2; i++) {
+    // process combs
+    m_allpasses[i].setSampleRate(sample_rate);
+    for (int j = 0; j < 6; j++) {
+      m_combs[i][j].setSampleRate(sample_rate);
     }
   }
 }
@@ -122,8 +132,8 @@ std::array<float, 2> StereoMoorer::processStereo(std::array<float, 2> inputs) {
     // add input[i] to avoid the phased opposed feedforward
     if (!m_parameters.freeze) {
       comb_sum = (comb_sum + inputs[i]) / 2;
+      comb_sum *= 2.0;
     }
-    comb_sum *= 2.0;
     outputs[i] = noi::Outils::equalPowerCrossfade(inputs[i], comb_sum,
                                                   m_parameters.dry_wet);
   }

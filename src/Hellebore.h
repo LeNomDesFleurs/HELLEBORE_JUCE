@@ -25,7 +25,7 @@ namespace noi {
  * 					  -> |comb| -> |pan| +
  * 					  -> |comb| -> |pan| +
  *
- * The pan is a cross fade with the corresponding comb 
+ * The pan is a cross fade with the corresponding comb
  * of the other channel
  */
 class StereoMoorer {
@@ -49,6 +49,7 @@ class StereoMoorer {
   void processCombs(std::array<float, 2> inputs);
   void processAllPasses(std::array<float, 2> inputs);
   void spatializeCombs();
+  void setSampleRate(float sample_rate);
   std::array<float, 2> processStereo(std::array<float, 2> inputs);
 
  private:
@@ -68,7 +69,5 @@ class StereoMoorer {
   std::array<std::array<float, 6>, 2> m_combs_status;
   std::array<float, 6> m_pan_coefs;
 }; /*StereoMoorer*/
-
-
 
 }  // namespace noi
