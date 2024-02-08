@@ -103,7 +103,6 @@ void HelleboreAudioProcessorEditor::paint(juce::Graphics& g) {
   // solid colour)
   g.fillAll(juce::Colour(47, 46, 45));
   g.setColour(juce::Colour(89, 106, 55));
-  g.setFont(15.0f);
   // g.
   float centerx = 240;
   float centery = 300;
@@ -137,7 +136,9 @@ void HelleboreAudioProcessorEditor::paint(juce::Graphics& g) {
     g.drawEllipse(Rectangle<float>(opp, adj, elipseSize, elipseSize), 2.);
   }
   // g.drawEllipse(Rectangle<float>(elipseSize, elipseSize), 2.);
-  g.drawFittedText("Hellebore", 0, 0, getWidth(), 30,
+  g.setFont(juce::Font("Times New Roman", 60.0f, juce::Font::italic));
+  // g.setFont(.0f);
+  g.drawFittedText("Hellebore", 0, 0, getWidth(), 60,
                    juce::Justification::centred, 1);
 }
 

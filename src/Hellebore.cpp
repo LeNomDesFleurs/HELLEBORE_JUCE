@@ -134,8 +134,8 @@ std::array<float, 2> StereoMoorer::processStereo(std::array<float, 2> inputs) {
       comb_sum = (comb_sum + inputs[i]) / 2;
       comb_sum *= 2.0;
     }
-    outputs[i] = noi::Outils::equalPowerCrossfade(inputs[i], comb_sum,
-                                                  m_parameters.dry_wet);
+    outputs[i] = 5 * noi::Outils::equalPowerCrossfade(inputs[i], comb_sum,
+                                                      m_parameters.dry_wet);
   }
   return outputs;
 }
