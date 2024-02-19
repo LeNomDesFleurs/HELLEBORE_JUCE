@@ -44,6 +44,8 @@ class HelleboreAudioProcessorEditor
 
   CentricKnob centricKnob;
 
+  RotationKnob rotationKnob;
+
   juce::Atomic<bool> parametersChanged{false};
 
   //   OtherLookAndFeel otherLookAndFeel;  // [2]
@@ -68,15 +70,16 @@ class HelleboreAudioProcessorEditor
       dryWetAttachement;
   juce::Label dryWetLabel;
 
-  juce::Slider freezeSlider;
-  std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
+  juce::ToggleButton freezeSlider;
+  std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>
       freezeAttachement;
   juce::Label freezeLabel;
+  const int width = 350;
 
   float elipseSize = 10.;
 
   // entre 0 et 1
-  float variation = 0;
+  float variation = 0.5;
 
   bool freeze = false;
 

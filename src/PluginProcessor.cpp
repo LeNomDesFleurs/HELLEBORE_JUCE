@@ -177,10 +177,10 @@ HelleboreAudioProcessor::createParameterLayout() {
       juce::NormalisableRange<float>(0.f, 1.f, 0.01f, 1.f), 1.f));
   layout.add(std::make_unique<juce::AudioParameterFloat>(
       "variation", "variation",
-      juce::NormalisableRange<float>(0.f, 1.f, 0.001f, 0.3f), 0.1));
+      juce::NormalisableRange<float>(0.f, 1.f, 0.0001f, 0.3f), 0.1));
   layout.add(std::make_unique<juce::AudioParameterFloat>(
       "comb_time", "comb_time",
-      juce::NormalisableRange<float>(0.f, 1.5f, 0.001f, 0.2f), 1.f));
+      juce::NormalisableRange<float>(0.f, 1.5f, 0.0001f, 0.2f), 1.f));
   layout.add(std::make_unique<juce::AudioParameterFloat>(
       "rt60", "rt60", juce::NormalisableRange<float>(0.f, 20.f, 0.1f, 1.f),
       5.f));

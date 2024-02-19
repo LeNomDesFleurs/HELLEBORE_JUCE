@@ -19,22 +19,22 @@ HelleboreAudioProcessorEditor::HelleboreAudioProcessorEditor(
   // dryWetSlider};
   apvts = &vts;
   //------------------------------------------------------
-  variationSlider.setLookAndFeel(&centricKnob);
+  variationSlider.setLookAndFeel(&rotationKnob);
   variationSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   variationAttachment.reset(
       new juce::AudioProcessorValueTreeState::SliderAttachment(
           vts, "variation", variationSlider));
-  variationSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false,
+  variationSlider.setTextBoxStyle(juce::Slider::NoTextBox, false,
                                   text_box_width,
                                   variationSlider.getTextBoxHeight());
 
   variationLabel.setText("variation", juce::dontSendNotification);
   //-------------------------------------------------------
   timeSlider.setLookAndFeel(&centricKnob);
-  timeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+  timeSlider.setSliderStyle(juce::Slider::LinearHorizontal);
   timeAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(
       vts, "rt60", timeSlider));
-  timeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, text_box_width,
+  timeSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, text_box_width,
                              timeSlider.getTextBoxHeight());
 
   timeLabel.setText("time", juce::dontSendNotification);
@@ -44,29 +44,29 @@ HelleboreAudioProcessorEditor::HelleboreAudioProcessorEditor(
   combSizeAttachement.reset(
       new juce::AudioProcessorValueTreeState::SliderAttachment(vts, "comb_time",
                                                                combSizeSlider));
-  combSizeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false,
-                                 text_box_width,
+  combSizeSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, text_box_width,
                                  combSizeSlider.getTextBoxHeight());
 
   combSizeLabel.setText("Comb Size", juce::dontSendNotification);
   //-------------------------------------------------------
   dryWetSlider.setLookAndFeel(&centricKnob);
-  dryWetSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+  dryWetSlider.setSliderStyle(juce::Slider::LinearHorizontal);
   dryWetAttachement.reset(
       new juce::AudioProcessorValueTreeState::SliderAttachment(vts, "dry_wet",
                                                                dryWetSlider));
-  dryWetSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false,
-                               text_box_width, dryWetSlider.getTextBoxHeight());
+  dryWetSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, text_box_width,
+                               dryWetSlider.getTextBoxHeight());
 
   dryWetLabel.setText("DryWet", juce::dontSendNotification);
   //--------------------------------------------------------
   freezeSlider.setLookAndFeel(&centricKnob);
-  freezeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+  // freezeSlider.setSliderStyle(juce::Button);
   freezeAttachement.reset(
-      new juce::AudioProcessorValueTreeState::SliderAttachment(vts, "freeze",
+      new juce::AudioProcessorValueTreeState::ButtonAttachment(vts, "freeze",
                                                                freezeSlider));
-  freezeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false,
-                               text_box_width, freezeSlider.getTextBoxHeight());
+  // freezeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false,
+  //                              text_box_width,
+  //                              freezeSlider.getTextBoxHeight());
 
   freezeLabel.setText("freeze", juce::dontSendNotification);
 
@@ -80,7 +80,7 @@ HelleboreAudioProcessorEditor::HelleboreAudioProcessorEditor(
     param->addListener(this);
   }
   startTimerHz(30);
-  setSize(480, 500);
+  setSize(350, 550);
 
   int random_order[12] = {1, 5, 8, 7, 11, 3, 12, 2, 10, 6, 9, 3};
 
@@ -101,11 +101,11 @@ HelleboreAudioProcessorEditor::~HelleboreAudioProcessorEditor() {
 void HelleboreAudioProcessorEditor::paint(juce::Graphics& g) {
   // (Our component is opaque, so we must completely fill the background with a
   // solid colour)
-  g.fillAll(juce::Colour(47, 46, 45));
-  g.setColour(juce::Colour(89, 106, 55));
+  g.fillAll(juce::Colour(237, 232, 229));
+  g.setColour(juce::Colour(137, 142, 46));
   // g.
-  float centerx = 240;
-  float centery = 300;
+  float centerx = this->width / 2;
+  float centery = 370;
 
   //   float rotation[12] =
 
@@ -143,27 +143,29 @@ void HelleboreAudioProcessorEditor::paint(juce::Graphics& g) {
 }
 
 void HelleboreAudioProcessorEditor::resized() {
-  const int marge_haute_slider = 60;
+  const int marge_haute_slider = 100;
 
-  variationSlider.setBounds({10, marge_haute_slider, 100, 100});
-  variationLabel.setBounds(
-      {variationSlider.getX(), variationSlider.getY() - 30, 200, 50});
+  combSizeSlider.setBounds({this->width / 4 - 30, marge_haute_slider, 60, 60});
+  // combSizeLabel.setBounds(
+  //     {combSizeSlider.getX() + 10, combSizeSlider.getY() - 30, 200, 50});
 
-  timeSlider.setBounds({100, marge_haute_slider, 100, 100});
-  timeLabel.setBounds(
-      {timeSlider.getX() + 30, timeSlider.getY() - 30, 200, 50});
+  freezeSlider.setBounds(
+      {(this->width / 2) - 15, marge_haute_slider + 30 - 15, 30, 30});
+  // freezeLabel.setBounds(
+  //     {freezeSlider.getX() + 10, freezeSlider.getY() - 30, 200, 50});
 
-  combSizeSlider.setBounds({190, marge_haute_slider, 100, 100});
-  combSizeLabel.setBounds(
-      {combSizeSlider.getX() + 10, combSizeSlider.getY() - 30, 200, 50});
+  variationSlider.setBounds(
+      {(this->width / 4) * 3 - 30, marge_haute_slider, 60, 60});
+  // variationLabel.setBounds(
+  //     {variationSlider.getX(), variationSlider.getY() - 30, 200, 50});
 
-  dryWetSlider.setBounds({275, marge_haute_slider, 100, 100});
-  dryWetLabel.setBounds(
-      {dryWetSlider.getX() + 10, dryWetSlider.getY() - 30, 200, 50});
+  timeSlider.setBounds({100, 200, 300, 25});
+  // timeLabel.setBounds(
+  //     {timeSlider.getX() + 30, timeSlider.getY() - 30, 200, 50});
 
-  freezeSlider.setBounds({360, marge_haute_slider, 100, 100});
-  freezeLabel.setBounds(
-      {freezeSlider.getX() + 10, freezeSlider.getY() - 30, 200, 50});
+  dryWetSlider.setBounds({20, 60, 310, 25});
+  // dryWetLabel.setBounds(
+  //     {dryWetSlider.getX() + 10, dryWetSlider.getY() - 30, 200, 50});
 
   // This is generally where you'll want to lay out the positions of any
   // subcomponents in your editor..
@@ -188,7 +190,7 @@ void HelleboreAudioProcessorEditor::parameterValueChanged(int parameterIndex,
   parametersChanged.set(true);
   switch (parameterIndex) {
     case 2:
-      elipseSize = newValue * 4 + 4;
+      elipseSize = newValue * 10 + 4;
       break;
     case 1:
       variation = newValue * 1.5;
