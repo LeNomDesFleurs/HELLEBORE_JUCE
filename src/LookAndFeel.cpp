@@ -40,14 +40,20 @@ void CentricKnob::drawRotarySlider(juce::Graphics& g, int x, int y, int width,
 
   juce::Path p;
   // sliderPos /= 1.6;
-  p.addEllipse(centreX - (width * sliderPos / 2),
-               centreY - (width * sliderPos / 2), width * sliderPos,
-               width * sliderPos);
+  p.addEllipse(centreX - (width * sliderPos ),
+               centreY - (width * sliderPos ), width * sliderPos * 2,
+               width * sliderPos * 2);
   //! [pointer]
   // pointer
   g.setColour(juce::Colours::white);
+  Path vignette;
+  vignette.addRoundedRectangle(0, 0, width, height, 5);
+
+    g.reduceClipRegion(vignette);
+
   g.fillPath(p);
   //! [pointer]
+
 }
 
 void CentricKnob::drawLinearSlider(Graphics& g, int x, int y, int width,
@@ -254,4 +260,33 @@ void CentricKnob::drawToggleButton(Graphics& g, ToggleButton& button,
   //                      .withTrimmedLeft(roundToInt(tickWidth) + 10)
   //                      .withTrimmedRight(2),
   //                  Justification::centredLeft, 10);
+}
+
+
+void DryWetLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y,
+                                        int width, int height, float sliderPos,
+                                        const float rotaryStartAngle,
+                                        const float rotaryEndAngle,
+                                        juce::Slider& slider)
+//! [drawRotarySlider]
+{
+  auto radius = (float)juce::jmin(width / 2, width / 2) - 10.0f;
+  auto centreX = (float)width * (float)sliderPos * 0.9;
+  auto centreY = (float)height/2.f;
+  
+  //! [locals]
+
+  g.setColour(CustomColors::getGradient(sliderPos));
+
+  // sliderPos /= 1.6;
+
+  juce::Path d;
+  d.addRoundedRectangle(-5, -(height-10)/2, 10, height-10, 5);
+  d.applyTransform(juce::AffineTransform::rotation(sliderPos * 3.14)
+                       .translated(centreX+5, centreY-5));
+  // d.applyTransform(juce::AffineTransform::translation(width*sliderPos*0.9, 0));
+  //! [pointer]
+  // pointer
+  g.fillPath(d);
+  //! [pointer]
 }

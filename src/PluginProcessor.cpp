@@ -175,6 +175,7 @@ HelleboreAudioProcessor::createParameterLayout() {
   layout.add(std::make_unique<juce::AudioParameterFloat>(
       "dry_wet", "dry_wet",
       juce::NormalisableRange<float>(0.f, 1.f, 0.01f, 1.f), 1.f));
+
   layout.add(std::make_unique<juce::AudioParameterFloat>(
       "variation", "variation",
       juce::NormalisableRange<float>(0.f, 1.f, 0.0001f, 0.3f), 0.1));

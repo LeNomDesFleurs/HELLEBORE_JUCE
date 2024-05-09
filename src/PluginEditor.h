@@ -12,12 +12,16 @@
 
 #include <cmath>
 
+#include "BackgroundComponent.hpp"
 #include "LookAndFeel.hpp"
 #include "PluginProcessor.h"
+#include "OpenGLComponent.hpp"
+#include "demoComponent.h"
 
 //==============================================================================
 /**
  */
+
 class HelleboreAudioProcessorEditor
     : public juce::AudioProcessorEditor,
       public juce::AudioProcessorParameter::Listener,
@@ -28,7 +32,7 @@ class HelleboreAudioProcessorEditor
   ~HelleboreAudioProcessorEditor() override;
 
   //==============================================================================
-  void paint(juce::Graphics&) override;
+  void paintOverChildren(juce::Graphics&) override;
   void resized() override;
   std::vector<juce::Component*> getComps();
   //   void sliderValueChanged(Slider* slider) override;
@@ -40,9 +44,14 @@ class HelleboreAudioProcessorEditor
  private:
   // This reference is provided as a quick way for your editor to
   // access the processor object that created it.
+  BackgroundComponent background_component;
+  OpenGLComponent openGLcomponent;
+  OpenGLDemo2D demo2D;
+
   HelleboreAudioProcessor& audioProcessor;
 
   CentricKnob centricKnob;
+  DryWetLookAndFeel drywet_look_and_feel;
 
   RotationKnob rotationKnob;
 

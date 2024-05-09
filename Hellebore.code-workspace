@@ -114,18 +114,17 @@
             "algorithm": "cpp",
             "*.mm": "cpp"
         }
+    },
+    "launch": {
+        "configurations": [
+            {
+                "type": "lldb",
+                "request": "launch",
+                "name": "CMake Debug",
+                "program": "${command:cmake.launchTargetPath}",
+                "args": [],
+                "cwd": "${workspaceFolder}"
+            }
+        ]
     }
-    // ,
-    // "launch": {
-    //     "configurations": [
-    //         {
-    //             "type": "lldb",
-    //             "request": "launch",
-    //             "name": "CMake Debug",
-    //             "program": "${command:cmake.launchTargetPath}",
-    //             "args": [],
-    //             "cwd": "${workspaceFolder}"
-    //         },
-    //     ]
-    // }
 }

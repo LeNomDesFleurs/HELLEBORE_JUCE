@@ -49,8 +49,8 @@ HelleboreAudioProcessorEditor::HelleboreAudioProcessorEditor(
 
   combSizeLabel.setText("Comb Size", juce::dontSendNotification);
   //-------------------------------------------------------
-  dryWetSlider.setLookAndFeel(&centricKnob);
-  dryWetSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+  dryWetSlider.setLookAndFeel(&drywet_look_and_feel);
+  dryWetSlider.setSliderStyle(juce::Slider::RotaryHorizontalDrag);
   dryWetAttachement.reset(
       new juce::AudioProcessorValueTreeState::SliderAttachment(vts, "dry_wet",
                                                                dryWetSlider));
@@ -70,10 +70,14 @@ HelleboreAudioProcessorEditor::HelleboreAudioProcessorEditor(
 
   freezeLabel.setText("freeze", juce::dontSendNotification);
 
+  addAndMakeVisible(background_component);
+
   for (auto* comp : getComps()) {
     addAndMakeVisible(comp);
     //   comp.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   }
+  addAndMakeVisible(openGLcomponent);
+  addAndMakeVisible(demo2D);
 
   const auto& params = audioProcessor.getParameters();
   for (auto param : params) {
@@ -88,6 +92,8 @@ HelleboreAudioProcessorEditor::HelleboreAudioProcessorEditor(
     float phase = i / 12.;
     lfos[random_order[i]].setPhase(phase);
   }
+
+  background_component.setBufferedToImage(true);
 }
 
 HelleboreAudioProcessorEditor::~HelleboreAudioProcessorEditor() {
@@ -98,11 +104,9 @@ HelleboreAudioProcessorEditor::~HelleboreAudioProcessorEditor() {
 }
 
 //==============================================================================
-void HelleboreAudioProcessorEditor::paint(juce::Graphics& g) {
+void HelleboreAudioProcessorEditor::paintOverChildren(juce::Graphics& g) {
   // (Our component is opaque, so we must completely fill the background with a
-  // solid colour)
-  g.fillAll(juce::Colour(237, 232, 229));
-  g.setColour(juce::Colour(137, 142, 46));
+
   // g.
   float centerx = this->width / 2;
   float centery = 370;
@@ -136,16 +140,14 @@ void HelleboreAudioProcessorEditor::paint(juce::Graphics& g) {
     g.drawEllipse(Rectangle<float>(opp, adj, elipseSize, elipseSize), 2.);
   }
   // g.drawEllipse(Rectangle<float>(elipseSize, elipseSize), 2.);
-  g.setFont(juce::Font("Times New Roman", 60.0f, juce::Font::italic));
-  // g.setFont(.0f);
-  g.drawFittedText("Hellebore", 0, 0, getWidth(), 60,
-                   juce::Justification::centred, 1);
 }
 
 void HelleboreAudioProcessorEditor::resized() {
+  background_component.setBounds(0, 0, 350, 550);
+
   const int marge_haute_slider = 100;
 
-  combSizeSlider.setBounds({this->width / 4 - 30, marge_haute_slider, 60, 60});
+  combSizeSlider.setBounds({this->width / 4 - 30, marge_haute_slider, 100, 60});
   // combSizeLabel.setBounds(
   //     {combSizeSlider.getX() + 10, combSizeSlider.getY() - 30, 200, 50});
 
@@ -164,6 +166,8 @@ void HelleboreAudioProcessorEditor::resized() {
   //     {timeSlider.getX() + 30, timeSlider.getY() - 30, 200, 50});
 
   dryWetSlider.setBounds({20, 60, 310, 25});
+
+  demo2D.setBounds(0, 0, 200, 200);
   // dryWetLabel.setBounds(
   //     {dryWetSlider.getX() + 10, dryWetSlider.getY() - 30, 200, 50});
 

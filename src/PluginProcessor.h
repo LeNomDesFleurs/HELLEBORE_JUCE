@@ -18,6 +18,7 @@
 //==============================================================================
 /**
  */
+
 noi::StereoMoorer::Parameters getSettings(
     juce::AudioProcessorValueTreeState& apvts);
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "CustomColors.hpp"
 
 class CentricKnob : public juce::LookAndFeel_V4 {
  public:
@@ -29,6 +30,15 @@ class RotationKnob : public juce::LookAndFeel_V4 {
   //! [otherLookAndFeel]
 
   //! [drawRotarySlider]
+  void drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
+                        float sliderPos, const float rotaryStartAngle,
+                        const float rotaryEndAngle,
+                        juce::Slider& slider) override;
+};
+
+
+class DryWetLookAndFeel : public juce::LookAndFeel_V4 {
+ public:
   void drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
                         float sliderPos, const float rotaryStartAngle,
                         const float rotaryEndAngle,
