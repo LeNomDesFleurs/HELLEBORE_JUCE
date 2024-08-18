@@ -180,3 +180,8 @@ g.reduceClipRegion(vignette);
 [get log](https://forum.juce.com/t/just-a-quick-gl-info-logger-func-for-any-of-you/32082)
 [maybe useful](https://forum.juce.com/t/creating-an-opengl-3-2-context-easy-fix-included/48872)
 [boilerplate that won't work](https://medium.com/@Im_Jimmi/using-opengl-for-2d-graphics-in-a-juce-plug-in-24aa82f634ff)
+[multiple demos](https://forum.juce.com/t/an-demo-of-how-use-opengl-with-juce-anyone-want-to-do-it-together/35422)
+
+Got it working with the Juce glsl 2D method, now I need to feed it a u_time
+
+Might as well use CPU blur such as [melatonin Blur](https://github.com/sudara/melatonin_blur?tab=readme-ov-file)
