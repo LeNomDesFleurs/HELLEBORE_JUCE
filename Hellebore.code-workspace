@@ -32,6 +32,7 @@
         ],
         "cmake.preferredGenerators": ["Ninja", "Unix Makefiles"],
         "files.associations": {
+            "*.tidal": "haskell",
             "iostream": "cpp",
             "__bit_reference": "cpp",
             "__bits": "cpp",
@@ -112,7 +113,8 @@
             "concepts": "cpp",
             "numeric": "cpp",
             "algorithm": "cpp",
-            "*.mm": "cpp"
+            "*.mm": "cpp",
+            "random": "cpp"
         }
     },
     "launch": {

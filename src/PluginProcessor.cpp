@@ -159,11 +159,11 @@ noi::StereoMoorer::Parameters getSettings(
     juce::AudioProcessorValueTreeState& apvts) {
   noi::StereoMoorer::Parameters settings;
 
-  settings.freeze = apvts.getRawParameterValue("freeze")->load() > 0.5;
+  settings.rt60 = apvts.getRawParameterValue("rt60")->load();
+  settings.freeze = settings.rt60 >= 20.0;
   settings.dry_wet = apvts.getRawParameterValue("dry_wet")->load();
   settings.comb_time = apvts.getRawParameterValue("comb_time")->load();
   settings.variation = apvts.getRawParameterValue("variation")->load();
-  settings.rt60 = apvts.getRawParameterValue("rt60")->load();
 
   return settings;
 }
@@ -172,21 +172,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout
 HelleboreAudioProcessor::createParameterLayout() {
   juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
-  layout.add(std::make_unique<juce::AudioParameterFloat>(
-      "dry_wet", "dry_wet",
-      juce::NormalisableRange<float>(0.f, 1.f, 0.01f, 1.f), 1.f));
+  using FloatRange = juce::NormalisableRange<float>;
+  using FloatParam = juce::AudioParameterFloat;
 
-  layout.add(std::make_unique<juce::AudioParameterFloat>(
-      "variation", "variation",
-      juce::NormalisableRange<float>(0.f, 1.f, 0.0001f, 0.3f), 0.1));
-  layout.add(std::make_unique<juce::AudioParameterFloat>(
-      "comb_time", "comb_time",
-      juce::NormalisableRange<float>(0.f, 1.5f, 0.0001f, 0.2f), 1.f));
-  layout.add(std::make_unique<juce::AudioParameterFloat>(
-      "rt60", "rt60", juce::NormalisableRange<float>(0.f, 20.f, 0.1f, 1.f),
-      5.f));
-  layout.add(
-      std::make_unique<juce::AudioParameterBool>("freeze", "freeze", false));
+  layout.add(std::make_unique<FloatParam>(
+      "dry_wet", "dry_wet", FloatRange(0.f, 1.f, 0.01f, 1.f), 1.f));
+  layout.add(std::make_unique<FloatParam>(
+      "variation", "variation", FloatRange(0.f, 1.f, 0.0001f, 0.3f), 0.1));
+  layout.add(std::make_unique<FloatParam>(
+      "comb_time", "comb_time", FloatRange(0.f, 1.5f, 0.0001f, 0.2f), 1.f));
+  layout.add(std::make_unique<FloatParam>(
+      "rt60", "rt60", FloatRange(0.f, 20.f, 0.1f, 1.f), 5.f));
 
   return layout;
 }
@@ -197,7 +193,7 @@ bool HelleboreAudioProcessor::hasEditor() const {
 }
 
 juce::AudioProcessorEditor* HelleboreAudioProcessor::createEditor() {
-  return new HelleboreAudioProcessorEditor(*this, apvts);
+  return new HelleboreEditor(*this, apvts);
   // return new GenericAudioProcessorEditor(*this);
 }
 

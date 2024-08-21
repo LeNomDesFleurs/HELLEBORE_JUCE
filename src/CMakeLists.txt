@@ -63,6 +63,7 @@ target_compile_definitions(Hellebore
 juce_add_binary_data(JuceLogoBinary
 SOURCES 
 ${CMAKE_SOURCE_DIR}/assets/juce-logo.svg
+${CMAKE_SOURCE_DIR}/assets/NOI.svg
 )
 
 file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp") #"${CMAKE_CURRENT_SOURCE_DIR}/*.h")

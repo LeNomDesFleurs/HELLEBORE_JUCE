@@ -97,10 +97,14 @@ float TriangleWave::getNextSample() {
   return (std::abs(m_status - 0.5) * 4) - 1;
 }
 
+float TriangleWave::getSample() { return (std::abs(m_status - 0.5) * 4) - 1; }
+
 float SawTooth::getNextSample() {
   phasor();
   return (m_status - 0.5) * 2;
 }
+
+float SawTooth::getSample() { return (m_status - 0.5) * 2; }
 
 }  // namespace Outils
 }  // namespace noi

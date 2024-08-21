@@ -65,17 +65,20 @@ class LFO {
   /// @param phase between 0 and 1
   void setPhase(float phase) { m_status = phase; }
   virtual float getNextSample() = 0;
+  virtual float getSample() = 0;
 };
 class TriangleWave : public LFO {
  public:
   using LFO::LFO;
   float getNextSample() override;
+  float getSample() override;
 };
 
 class SawTooth : public LFO {
  public:
   using LFO::LFO;
   float getNextSample() override;
+  float getSample() override;
 };
 
 }  // namespace Outils
