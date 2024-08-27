@@ -43,7 +43,7 @@ void StereoMoorer::setTime() {
   for (int i = 0; i < 2; i++) {
     m_allpasses[i].setGain(rt60);
     for (int j = 0; j < 6; j++) {
-      m_combs[i][j].setGain(rt60);
+      m_combs[i][j].overrideFeedback(rt60/20.);
       ;
     }
   }
@@ -130,12 +130,13 @@ std::array<float, 2> StereoMoorer::processStereo(std::array<float, 2> inputs) {
     }
     comb_sum /= 6.f;
     // add input[i] to avoid the phased opposed feedforward
-    if (!m_parameters.freeze) {
-      comb_sum = (comb_sum + inputs[i]) / 2;
-      comb_sum *= 2.0;
-    }
-    outputs[i] = 5 * noi::Outils::equalPowerCrossfade(inputs[i], comb_sum,
-                                                      m_parameters.dry_wet);
+    // if (!m_parameters.freeze) {
+    //   comb_sum = (comb_sum + inputs[i]) / 2;
+    //   comb_sum *= 2.0;
+    // }
+    outputs[i] = ((4 * m_parameters.dry_wet) + 1) *
+                 noi::Outils::equalPowerCrossfade(inputs[i], comb_sum,
+                                                  m_parameters.dry_wet);
   }
   return outputs;
 }

@@ -40,3 +40,9 @@ juce::Colour CustomColors::getGradientWithoutGreen(float value) {
   }
   return CustomColors::custom_colors[4];
 }
+
+/// @brief get a colour and fade it to the background color, 0 if fully faded, 1 is unchanged input color
+juce::Colour CustomColors::fadeToDefault(juce::Colour colour, float value)
+{
+  return CustomColors::custom_colors[0].interpolatedWith(colour, value);
+}

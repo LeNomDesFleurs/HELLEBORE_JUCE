@@ -72,7 +72,7 @@ Comb::Comb(float time) {
 float Comb::process(float input) {
   float delay = m_buffer.readSample();
   delay = noi::Outils::clipValue(delay, -1.f, 1.f);
-  float output = input + (delay * m_gain);
+  float output = noi::Outils::equalPowerCrossfade(input, delay, m_gain);
   m_buffer.writeSample(output);
   return output;
 }

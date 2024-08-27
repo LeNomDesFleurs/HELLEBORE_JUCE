@@ -28,7 +28,7 @@ HelleboreEditor::HelleboreEditor(HelleboreAudioProcessor& p,
 
   variationSlider.setLookAndFeel(&empty_knob_look_and_feel);
   timeSlider.setLookAndFeel(&empty_knob_look_and_feel);
-  combSizeSlider.setLookAndFeel(&centricKnob);
+  combSizeSlider.setLookAndFeel(&empty_knob_look_and_feel);
   dryWetSlider.setLookAndFeel(&drywet_look_and_feel);
 
   timeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
@@ -86,6 +86,7 @@ void HelleboreEditor::paintOverChildren(juce::Graphics& g) {
   }
   paintVariationWidget(g);
   paintTimeWidget(g);
+  paintSizeWidget(g);
   repaint_ui = false;
 }
 
@@ -110,11 +111,14 @@ std::vector<juce::Slider*> HelleboreEditor::getComps() {
 void HelleboreEditor::parameterValueChanged(int parameterIndex,
                                             float newValue) {
   switch (parameterIndex) {
+    case 0:
+      dry_wet = newValue;
+      break;
     case 2:
-      elipseSize = newValue * 10 + 4;
+      size = newValue;
       break;
     case 1:
-      variation = newValue * 1.5;
+      variation = newValue;
       break;
     case 4:
       freeze = newValue > 0.5;
@@ -137,29 +141,39 @@ void HelleboreEditor::paintVariationWidget(juce::Graphics& g) {
   float centery = 375;
 
   //   float rotation[12] =
-
+  float distance = size*9.0+1;
   for (int i = 0; i < 12; i++) {
     float rotation = (cheappi / 12) * i;
     rotation += rotation_status;
     float max_far = 10 + (i * 1.6);
 
     float lfo;
+    lfos[i].setFrequency(2/(distance));
     lfo = repaint_ui ? lfos[i].getNextSample() : lfos[i].getSample();
 
-    float far = max_far * pow(variation, 2.0) * (lfo * 2);
+    float far = (lfo * 2) * cheappi;
+    // max_far* pow(variation * 1.5, 2.0) * (lfo * 2);
+
+    float elipseSize = size * 10 + 4;
 
     float opp = std::sin(rotation) * far;
     float adj = std::cos(rotation) * far;
+    float x = (distance * cos(far)) - (elipseSize / 2.0);
+    float y = (distance * sin(far)) - (elipseSize / 2.0);
 
+    distance *= 1 + variation/4.;
+    x += centerx;
+    y += centery;
     opp += centerx;
     adj += centery;
-
     opp -= elipseSize / 2;
     adj -= elipseSize / 2;
     // sin theta * hypotenuse = Op
     // cos theta * hypo = adj
-    g.setColour(CustomColors::dark_green);
-    g.drawEllipse(Rectangle<float>(opp, adj, elipseSize, elipseSize), 2.);
+    juce::Colour colour = CustomColors::getGradientWithoutGreen(variation);
+    colour = CustomColors::fadeToDefault(colour, dry_wet);
+    g.setColour(colour);
+    g.drawEllipse(Rectangle<float>(x, y, elipseSize, elipseSize), 2.);
   }
 }
 
@@ -171,7 +185,9 @@ void HelleboreEditor::paintTimeWidget(juce::Graphics& g) {
   float bottom_offset = 0.08;
   float offset_time = time * (1.0 - bottom_offset) + bottom_offset;
 
-  g.setColour(CustomColors::getGradientWithoutGreen(time));
+  juce::Colour colour = CustomColors::getGradientWithoutGreen(time);
+  colour = CustomColors::fadeToDefault(colour, dry_wet);
+  g.setColour(colour);
 
   float radian_goal = cheappi * offset_time;
 
@@ -192,4 +208,42 @@ void HelleboreEditor::paintTimeWidget(juce::Graphics& g) {
                                                     arrow_height);
 
   g.strokePath(p, stroke);
+}
+
+void HelleboreEditor::paintSizeWidget(juce::Graphics& g) {
+  int x = 155;
+  int y = 65;
+  int width = 125;
+  int height = 125;
+
+  float centreX = (float)x + (float)width * 0.5f;
+  float centreY = (float)y + (float)height * 0.5f;
+
+  float sliderPos = size;
+  sliderPos = std::pow(sliderPos, 4);
+  sliderPos += 0.1;
+  sliderPos *= 1.3;
+
+  float diameter = static_cast<float>(width) * sliderPos;
+  float radius = diameter / 2.f;
+
+  juce::Path p;
+  float circlex = centreX - radius;
+  float circley = centreY - radius;
+  float circlew = diameter;
+  float circleh = diameter;
+  p.addEllipse(circlex, circley, circlew, circleh);
+
+  // warning, need linear value for color gradient
+  juce::Colour colour = CustomColors::getGradientWithoutGreen(sliderPos);
+  colour = CustomColors::fadeToDefault(colour, dry_wet);
+  g.setColour(colour);
+
+  Path vignette;
+  vignette.addRoundedRectangle(x, y, width, height, 5);
+
+  g.reduceClipRegion(vignette);
+
+  g.fillPath(p);
+  //! [pointer]
 }

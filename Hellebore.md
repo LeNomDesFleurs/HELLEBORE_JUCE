@@ -26,6 +26,9 @@
 - [ ] default values in a header (hellebore.h?)
 - [ ] augmenter size quand comb grandit (reduire amplitude) sinon pas de son quand temps faible
 - [ ] en dry le son est amplifié
+- [ ] change lfo rotation speed depending on the freeze mode, rotation / aller retour
+- [ ] some kind of shaping on the panning variation effect, to sharp
+
 
 ## Segmentation fault / Assertion failure
 

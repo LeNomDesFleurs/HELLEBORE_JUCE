@@ -19,4 +19,5 @@ const std::vector<juce::Colour> custom_colors = {dark_green, light_green,
 
 juce::Colour getGradient(float value);
 juce::Colour getGradientWithoutGreen(float value);
+juce::Colour fadeToDefault(juce::Colour colour, float value);
 }  // namespace CustomColors
