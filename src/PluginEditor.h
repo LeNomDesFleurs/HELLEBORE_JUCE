@@ -64,7 +64,7 @@ class HelleboreEditor : public juce::AudioProcessorEditor,
   bool freeze = false;
   float time = 0.25;
   float dry_wet = 1.;
-  float size = 0.92212;
+  float size = 0.76;
   bool repaint_ui = true;
   float rotation_status;
   juce::Atomic<bool> parametersChanged{false};

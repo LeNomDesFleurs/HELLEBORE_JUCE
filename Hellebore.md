@@ -11,23 +11,23 @@
 - [x] ~~functional reverb~~
 - [x] ~~un peu bizarre de finir pas le allpass, il devrait plutôt être au début~~
 - [x] ~~faire un fader qui fait bouger un cercle sur l'ui~~
-- [ ] Faire un nouveau gradient de couleur
-- [ ] getting rid of the security padding in RingBuffer.cpp ln:77
-- [ ] utiliser des gradients radiaux transparent au bord pour masquer un motif background
-- [ ] ajouter le logo
+- [x] Faire un nouveau gradient de couleur
+- [x] getting rid of the security padding in RingBuffer.cpp ln:77
+- [x] utiliser des gradients radiaux transparent au bord pour masquer un motif background
+- [x] ajouter le logo
 - [ ] find a way to not updateStepSize once it is stable
 - [ ] Big problem, Ringbuffer s'instancie avant de recevoir son sample rate
-- [ ] try stepped repitching ?
+- [x] try stepped repitching ?
 - [ ] adding modulation ?
 - [ ] problème dans mon pan : je somme des potentiel problème de phase, quoi que ça doit pas être très problématique puisque c'est la sortie des combs
-- [ ] augmenter taille max des buffers
+- [x] augmenter taille max des buffers
 - [ ] Gros problème de variation de volume, test à faire
 - [x] ~~Se pencher sur les histoire de edit pendant que ça run ?~~
 - [ ] default values in a header (hellebore.h?)
-- [ ] augmenter size quand comb grandit (reduire amplitude) sinon pas de son quand temps faible
-- [ ] en dry le son est amplifié
+- [x] augmenter size quand comb grandit (reduire amplitude) sinon pas de son quand temps faible
+- [x] en dry le son est amplifié
 - [ ] change lfo rotation speed depending on the freeze mode, rotation / aller retour
-- [ ] some kind of shaping on the panning variation effect, to sharp
+- [x] some kind of shaping on the panning variation effect, to sharp
 
 
 ## Segmentation fault / Assertion failure

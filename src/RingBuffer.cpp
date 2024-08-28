@@ -15,6 +15,8 @@ RingBuffer::RingBuffer(int max_size, int initial_delay, double _sample_rate) {
   m_actual_size = m_write;
   m_read = 0;
   m_frac = 0;
+  m_step_size = 1.0;
+  freezed = false;
 }
 RingBuffer::RingBuffer() {}
 
@@ -30,6 +32,8 @@ RingBuffer::RingBuffer(float max_size) {
   m_read = 0;
   m_actual_size = m_write;
   m_size_goal = m_actual_size;
+  m_step_size = 1.0;
+  freezed = false;
 }
 
 /// @brief increment pointer and set its int, incremented int and frac value
@@ -40,6 +44,13 @@ void RingBuffer::incrementReadPointer() {
   // in case of reverse read
   else if (m_read < 0)
     m_read += m_buffer_size;
+}
+
+float RingBuffer::getActualSize(){
+  float temp_read = m_read;
+  if (m_read > m_write) temp_read -= m_buffer_size;
+  float output = m_write - temp_read;
+  return output;
 }
 
 /// @brief increment read pointer and return sample from interpolation
@@ -71,6 +82,9 @@ float RingBuffer::readSample() {
       break;
   }
 
+  if (freezed) {
+      m_output_sample *= noi::Outils::clipValue(1. / m_step_size, 0.2, 3.);
+  }
   return m_output_sample;
 }
 
@@ -106,20 +120,23 @@ void RingBuffer::setStepSize(float step_size) { m_step_size = step_size; }
 /// @brief Triggered at each sample, update the step size and the m_actual_size
 /// to keep up with change of size goal
 void RingBuffer::updateStepSize() {
-  float correction_offset;
-  if (m_actual_size > (m_size_goal - 5) && m_actual_size < (m_size_goal + 5)) {
-    m_step_size = 1.0;
-  } else if (m_actual_size > m_size_goal) {
-    m_step_size = 1.5;
-    m_actual_size -= 0.5;
+  float step_size_goal = 1.0;
+  m_actual_size = getActualSize();
+  //big sample limit to account for inertia
+  if (m_actual_size > (m_size_goal - 200) && m_actual_size < (m_size_goal + 200) && new_size) {
+    // step_size_goal = 1.0;
+    new_size = false;
+  } else if ((m_actual_size > m_size_goal) && new_size) {
+    // m_step_size = 1.5;
+    step_size_goal = 2.0;
     // update the step size but with slew for clean repitch
-  } else if (m_actual_size < m_size_goal) {
-    m_step_size = 0.5;
-    m_actual_size += 0.5;
+  } else if ((m_actual_size < m_size_goal) && new_size) {
+    // m_step_size = 0.5;
+    step_size_goal = 0.5;
   }
 
-  // m_step_size = noi::Outils::slewValue(correction_offset, m_step_size,
-  // 0.999);
+  m_step_size = noi::Outils::slewValue(step_size_goal, m_step_size,
+  0.999);//should be modified by sample rate
 
   // if (m_step_size > 0.999 && m_step_size < 1.0001) {
   //   m_step_size = 1.0;
@@ -140,10 +157,11 @@ void RingBuffer::updateStepSize() {
 /// buffer size and set the goal to reach.
 /// @param delay_time in milliseconds
 void RingBuffer::setDelayTime(float delay_time) {
+  new_size = true;
   float delay_in_samples =
       noi::Outils::convertMsToSample(delay_time, sample_rate);
   //   adding some 4 samples padding just to be sure.
-  m_size_goal = noi::Outils::clipValue(delay_in_samples, 4, m_buffer_size - 4);
+  m_size_goal = noi::Outils::clipValue(delay_in_samples, 0, m_buffer_size-1);
 }
 
 void RingBuffer::setSampleRate(float _sample_rate) {
@@ -153,13 +171,14 @@ void RingBuffer::setSampleRate(float _sample_rate) {
 void RingBuffer::setFreezed(bool _freezed) {
   // avoid updating the m_size_on_freeze
   if (!freezed) {
-    m_size_on_freeze = m_actual_size;
+    m_size_on_freeze = getActualSize();
   }
   freezed = _freezed;
 }
 
 void RingBuffer::freezedUpdateStepSize() {
-  m_step_size = m_size_on_freeze / m_size_goal;
+  float step_size_goal = m_size_on_freeze / m_size_goal;
+  m_step_size = noi::Outils::slewValue(step_size_goal, m_step_size, 0.999);
 }
 
 void RingBuffer::checkForReadIndexOverFlow() {

@@ -159,13 +159,14 @@ noi::StereoMoorer::Parameters getSettings(
     juce::AudioProcessorValueTreeState& apvts) {
   noi::StereoMoorer::Parameters settings;
 
-  settings.freeze = settings.rt60 >= 20.0;
   settings.dry_wet = apvts.getRawParameterValue("dry_wet")->load();
   settings.comb_time = apvts.getRawParameterValue("comb_time")->load();
   settings.variation = apvts.getRawParameterValue("variation")->load();
   float rt60 = apvts.getRawParameterValue("rt60")->load();
   // minimum time grows when comb time grows to keep some minimal feedback
-  settings.rt60 = noi::Outils::mapValue(rt60, 0.05, 20., settings.comb_time *4.,20.);
+  // max comb_time = 1.5 -> 1.5 * 5
+  settings.rt60 = noi::Outils::mapValue(rt60, 0.05, 20., settings.comb_time *5.,20.);
+  settings.freeze = settings.rt60 >= 20.0;
 
   return settings;
 }
@@ -182,7 +183,7 @@ HelleboreAudioProcessor::createParameterLayout() {
   layout.add(std::make_unique<FloatParam>(
       "variation", "variation", FloatRange(0.f, 1.f, 0.0001f, 0.3f), 0.1));
   layout.add(std::make_unique<FloatParam>(
-      "comb_time", "comb_time", FloatRange(0.01f, 1.5f, 0.0001f, 0.2f), 1.f));
+      "comb_time", "comb_time", FloatRange(0.01f, 3.9f, 0.0001f, 0.2f), 1.f));
   layout.add(std::make_unique<FloatParam>(
       "rt60", "rt60", FloatRange(0.05f, 20.f, 0.1f, 1.f), 5.f));
 

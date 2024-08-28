@@ -29,6 +29,7 @@ class RingBuffer {
   /// @brief Split read index in m_i_read (previous sample) m_i_read_next (next
   /// sample) and m_frac (fractional offset)
   void fractionalizeReadIndex();
+  float getActualSize();
 
  private:
   enum InterpolationMode { none, linear, allpass };
@@ -47,5 +48,6 @@ class RingBuffer {
   float m_size_on_freeze;
   float m_frac;
   float m_output_sample;
+  bool new_size;
 };
 }  // namespace noi

@@ -14,54 +14,77 @@ namespace noi {
 
 StereoMoorer::StereoMoorer(noi::StereoMoorer::Parameters parameters) {
   updateParameters(parameters);
+  m_old_parameters = parameters;
   std::fill(begin(m_combs_status[0]), end(m_combs_status[0]), 0.0);
   std::fill(begin(m_combs_status[1]), end(m_combs_status[1]), 0.0);
   std::fill(begin(m_pan_coefs), end(m_pan_coefs), 0.0);
+  m_allpasses[0].setGain(0.9);
+  m_allpasses[1].setGain(0.9);
 };
 
 void StereoMoorer::updateParameters(noi::StereoMoorer::Parameters parameters) {
   m_parameters = parameters;
-  setTime();
-  setFreeze();
-  resizeComb();
-  setPan();
+  setTime();     // time
+  setFreeze();   // freeze
+  resizeComb();  // variation + comb
+  setPan();      // variation
+  m_old_parameters = m_parameters;
+}
+
+bool StereoMoorer::variationHaventChange() {
+  return m_parameters.variation == m_old_parameters.variation;
+}
+
+bool StereoMoorer::timeHaventChange() {
+  return m_parameters.rt60 == m_old_parameters.rt60;
+}
+
+bool StereoMoorer::combSizeHaventChange() {
+  return m_parameters.comb_time == m_old_parameters.comb_time;
+}
+
+bool StereoMoorer::freezeHaventChange() {
+  return m_parameters.freeze == m_old_parameters.freeze;
 }
 
 // more variation -> more bleeding between channels
 void StereoMoorer::setPan() {
+  if (variationHaventChange()) return;
   float variation = m_parameters.variation;
   for (int i = 2; i < 6; i++) {
-    m_pan_coefs[i] = variation;
-    variation *= 2;
+    m_pan_coefs[i] = noi::Outils::clipValue(variation, 0.0, 1.0);
+    variation *= 1.5;
   }
 }
 
 // more variation -> more diffrence of gain between combs
 void StereoMoorer::setTime() {
+  if (timeHaventChange()) return;
   float rt60 = m_parameters.rt60;
-  float variation = m_parameters.variation + 1.f;
   for (int i = 0; i < 2; i++) {
-    m_allpasses[i].setGain(rt60);
+    // m_allpasses[i].setGain(rt60);
     for (int j = 0; j < 6; j++) {
-      m_combs[i][j].overrideFeedback(rt60/20.);
+      m_combs[i][j].overrideFeedback(rt60 / 20.);
       ;
     }
   }
 }
 
 void StereoMoorer::setFreeze() {
+  if (freezeHaventChange()) return;
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 6; j++) {
       m_combs[i][j].setFreeze(m_parameters.freeze);
     }
     for (auto& allpases : m_allpasses) {
-      allpases.setFreeze(m_parameters.freeze);
+      // allpases.setFreeze(m_parameters.freeze);
     }
   }
 }
 
 // more variation -> more diffrence of gain between combs
 void StereoMoorer::resizeComb() {
+  if (combSizeHaventChange() && variationHaventChange()) return;
   float variation = m_parameters.variation + 1.f;
   for (int i = 0; i < 2; i++) {
     float time = m_parameters.comb_time;
@@ -104,9 +127,9 @@ void StereoMoorer::spatializeCombs() {
     float in_right = m_combs_status[1][i];
     // out_left = in_left * pan + in_right * (1 - pan);
     m_combs_status[0][i] =
-        noi::Outils::linearCrossfade(in_left, in_right, m_pan_coefs[i]);
-    m_combs_status[1][i] =
-        noi::Outils::linearCrossfade(in_left, in_right, (1.f - m_pan_coefs[i]));
+        noi::Outils::equalPowerCrossfade(in_left, in_right, m_pan_coefs[i]);
+    m_combs_status[1][i] = noi::Outils::equalPowerCrossfade(
+        in_left, in_right, (1.f - m_pan_coefs[i]));
   }
 }
 
