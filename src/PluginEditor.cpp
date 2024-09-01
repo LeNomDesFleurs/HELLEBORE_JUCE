@@ -15,7 +15,7 @@ HelleboreEditor::HelleboreEditor(HelleboreAudioProcessor& p,
                                  juce::AudioProcessorValueTreeState& vts)
     : AudioProcessorEditor(&p), audioProcessor(p) {
   const float text_box_width = 50.0f;
-  // juce::Slider comps [4]= {variationSlider, timeSlider, combSizeSlider,
+  // juce::Slider comps [4]= {variationSlider, feedbackSlider, combSizeSlider,
   // dryWetSlider};
   apvts = &vts;
 
@@ -27,11 +27,11 @@ HelleboreEditor::HelleboreEditor(HelleboreAudioProcessor& p,
   //------------------------------------------------------
 
   variationSlider.setLookAndFeel(&empty_knob_look_and_feel);
-  timeSlider.setLookAndFeel(&empty_knob_look_and_feel);
+  feedbackSlider.setLookAndFeel(&empty_knob_look_and_feel);
   combSizeSlider.setLookAndFeel(&empty_knob_look_and_feel);
   dryWetSlider.setLookAndFeel(&drywet_look_and_feel);
 
-  timeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+  feedbackSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   combSizeSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   variationSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   dryWetSlider.setSliderStyle(juce::Slider::RotaryHorizontalDrag);
@@ -39,7 +39,7 @@ HelleboreEditor::HelleboreEditor(HelleboreAudioProcessor& p,
   using Attachment = juce::AudioProcessorValueTreeState::SliderAttachment;
 
   variationAttachment.reset(new Attachment(vts, "variation", variationSlider));
-  timeAttachment.reset(new Attachment(vts, "rt60", timeSlider));
+  feedbackAttachment.reset(new Attachment(vts, "feedback", feedbackSlider));
   combSizeAttachement.reset(new Attachment(vts, "comb_time", combSizeSlider));
   dryWetAttachement.reset(new Attachment(vts, "dry_wet", dryWetSlider));
 
@@ -95,13 +95,13 @@ void HelleboreEditor::resized() {
 
   combSizeSlider.setBounds({155, 65, 125, 125});
   variationSlider.setBounds({25, 250, 250, 250});
-  timeSlider.setBounds({20, 65, 125, 125});
+  feedbackSlider.setBounds({20, 65, 125, 125});
   dryWetSlider.setBounds({25, 205, 265, 40});
 }
 
 std::vector<juce::Slider*> HelleboreEditor::getComps() {
   return {
-      &timeSlider,
+      &feedbackSlider,
       &variationSlider,
       &dryWetSlider,
       &combSizeSlider,
@@ -141,14 +141,14 @@ void HelleboreEditor::paintVariationWidget(juce::Graphics& g) {
   float centery = 375;
 
   //   float rotation[12] =
-  float distance = size*9.0+1;
+  float distance = size * 9.0 + 1;
   for (int i = 0; i < 12; i++) {
     float rotation = (cheappi / 12) * i;
     rotation += rotation_status;
     float max_far = 10 + (i * 1.6);
 
     float lfo;
-    lfos[i].setFrequency(2/(distance));
+    lfos[i].setFrequency(2 / (distance));
     lfo = repaint_ui ? lfos[i].getNextSample() : lfos[i].getSample();
 
     float far = (lfo * 2) * cheappi;
@@ -161,7 +161,7 @@ void HelleboreEditor::paintVariationWidget(juce::Graphics& g) {
     float x = (distance * cos(far)) - (elipseSize / 2.0);
     float y = (distance * sin(far)) - (elipseSize / 2.0);
 
-    distance *= 1 + variation/4.;
+    distance *= 1 + variation / 4.;
     x += centerx;
     y += centery;
     opp += centerx;

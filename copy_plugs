@@ -1,0 +1,2 @@
+cp -r build/src/Hellebore_artefacts/Release/VST3/Hellebore.vst3 /Library/Audio/Plug-Ins/VST3/
+cp -r build/src/Hellebore_artefacts/Release/AU/Hellebore.component /Library/Audio/Plug-Ins/Components/

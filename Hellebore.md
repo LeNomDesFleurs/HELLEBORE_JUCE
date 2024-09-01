@@ -28,6 +28,10 @@
 - [x] en dry le son est amplifié
 - [ ] change lfo rotation speed depending on the freeze mode, rotation / aller retour
 - [x] some kind of shaping on the panning variation effect, to sharp
+- [ ] slew harder
+- [ ] get rid of the size / feedback compensation ?
+- [ ] increase comb-time precision (especially for the loop mode)
+- [ ] freeze mode cross fade ? wait 10 or 20 more sample to get handles, then cross fade at the point of the write
 
 
 ## Segmentation fault / Assertion failure

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <JuceHeader.h>
+
 #include <iostream>
 #include <vector>
 
@@ -9,9 +11,7 @@ namespace noi {
 
 class RingBuffer {
  public:
-  RingBuffer(int max_size, int initial_delay, double _sample_rate);
-  RingBuffer(float max_size);
-  RingBuffer();
+  RingBuffer(float max_time, float initial_delay, int _sample_rate);
   float readSample();
   void writeSample(float input_sample);
   void linearInterpolation();
@@ -30,24 +30,35 @@ class RingBuffer {
   /// sample) and m_frac (fractional offset)
   void fractionalizeReadIndex();
   float getActualSize();
+  void crossfade();
 
  private:
+  // the accumulating status is used before freezing,
+  // it collect some more sample before making a fade with the previous signal,
+  // a simpe freeze whitout this fade would produce clicks when going from last
+  // wrote to first wrote
+  unsigned int m_samples_for_fade{100};
+  int sample_rate;
+  enum BufferMode { normal, accumulate, freeze, reverse };
+  BufferMode m_buffer_mode{normal};
   enum InterpolationMode { none, linear, allpass };
   InterpolationMode interpolation_mode = linear;
-  bool freezed;
-  bool reverse;
-  int sample_rate = 48000;
   std::vector<float> m_buffer;
-  float m_read, m_write;
-  int m_i_read;
-  int m_i_read_next;
-  float m_step_size = 1;
+  std::vector<float> m_crossfade_buffer;
+  int m_write;
+  float m_read{};
+  int m_i_read{};
+  int m_i_read_next{};
+  float m_frac{};
+  float m_step_size{1.0};
+  int m_size_goal;
   // m_buffer_size en base 0
-  int m_size_goal, m_buffer_size;
-  float m_actual_size;
-  float m_size_on_freeze;
-  float m_frac;
-  float m_output_sample;
-  bool new_size;
+  int m_buffer_size;
+  float m_actual_size{};
+  float m_size_on_freeze{};
+  float m_output_sample{};
+  bool new_size{false};
+  // number of sample accumulated before fading and freezing
+  int accumulate_count{};
 };
 }  // namespace noi

@@ -18,6 +18,10 @@ namespace Filter {
 //     m_buffer = noi::RingBuffer(time);
 // 	m_looptime = time;
 // }
+Filter::Filter(float max_time, float initial_delay, int sample_rate) 
+  : m_buffer(max_time, initial_delay, sample_rate)
+  , m_looptime {max_time}
+{}
 
 void Filter::setReadSpeed(float ratio) { m_buffer.setStepSize(ratio); }
 
@@ -47,10 +51,10 @@ float Filter::process(float sample) { return sample; }
 
 float Filter::processFreezed() { return m_buffer.readSample(); }
 
-Allpass::Allpass(float time) {
-  m_buffer = noi::RingBuffer(time);
-  m_looptime = time;
-}
+// Allpass::Allpass(float max_time, float initial_delay, int sample_rate) 
+//   : m_buffer(max_time, initial_delay, sample_rate)
+//   , m_looptime {max_time}
+// {}
 
 float Allpass::process(float input) {
   float delay = m_buffer.readSample();
@@ -64,10 +68,10 @@ float Allpass::process(float input) {
   return y;
 }
 
-Comb::Comb(float time) {
-  m_buffer = noi::RingBuffer(time);
-  m_looptime = time;
-}
+// Comb::Comb(float max_time, float initial_delay, int sample_rate)
+//   : m_buffer(max_time, initial_delay, sample_rate)
+//   , m_looptime {max_time}
+// {}
 
 float Comb::process(float input) {
   float delay = m_buffer.readSample();

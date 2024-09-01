@@ -24,7 +24,7 @@ namespace Filter {
 
 class Filter {
  public:
-  //   Filter(float time);
+  Filter(float max_time, float initial_delay, int sample_rate);
   void setReadSpeed(float ratio);
   void setGain(float rt60);
   void overrideFeedback(float feedback);
@@ -35,20 +35,22 @@ class Filter {
   void setSampleRate(float sample_rate);
 
  protected:
-  noi::RingBuffer m_buffer{0.2};
+  noi::RingBuffer m_buffer;
   float m_gain;
   float m_looptime;
 };
 
 class Allpass : public Filter {
  public:
-  Allpass(float time);
+  using Filter::Filter;
+  // Allpass(float max_time, float initial_delay, int sample_rate);
   float process(float input);
 };
 
 class Comb : public Filter {
  public:
-  Comb(float time);
+ using Filter::Filter;
+  // Comb(float max_time, float initial_delay, int sample_rate);
   float process(float input);
 }; /*Comb*/
 

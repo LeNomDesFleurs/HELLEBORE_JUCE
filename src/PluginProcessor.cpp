@@ -79,7 +79,7 @@ void HelleboreAudioProcessor::changeProgramName(int index,
 //==============================================================================
 void HelleboreAudioProcessor::prepareToPlay(double sampleRate,
                                             int samplesPerBlock) {
-  hellebore.setSampleRate(sampleRate);
+  hellebore = noi::StereoMoorer(hellebore_parameters, (int)sampleRate);
   // Use this method as the place to do any pre-playback
   // initialisation that you need..
 }
@@ -124,7 +124,7 @@ void HelleboreAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     buffer.clear(i, 0, buffer.getNumSamples());
 
   hellebore_parameters = getSettings(apvts);
-  hellebore.updateParameters(hellebore_parameters);
+  hellebore->updateParameters(hellebore_parameters);
   // ringBuffer.setDelayTime(hellebore_parameters.comb_time * 1000);
 
   // hellebore.updateParameters(hellebore_parameters);
@@ -138,7 +138,7 @@ void HelleboreAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
   for (auto n = 0; n < buffer.getNumSamples(); ++n) {
     std::array<float, 2> stereo_samples = {LeftChannelSamples[n],
                                            RightChannelSamples[n]};
-    stereo_samples = hellebore.processStereo(stereo_samples);
+    stereo_samples = hellebore->processStereo(stereo_samples);
 
     // ringBuffer.writeSample(LeftChannelSamples[n]);
 
@@ -162,11 +162,12 @@ noi::StereoMoorer::Parameters getSettings(
   settings.dry_wet = apvts.getRawParameterValue("dry_wet")->load();
   settings.comb_time = apvts.getRawParameterValue("comb_time")->load();
   settings.variation = apvts.getRawParameterValue("variation")->load();
-  float rt60 = apvts.getRawParameterValue("rt60")->load();
+  settings.feedback = apvts.getRawParameterValue("feedback")->load();
   // minimum time grows when comb time grows to keep some minimal feedback
   // max comb_time = 1.5 -> 1.5 * 5
-  settings.rt60 = noi::Outils::mapValue(rt60, 0.05, 20., settings.comb_time *5.,20.);
-  settings.freeze = settings.rt60 >= 20.0;
+  // settings.feedback =
+      // noi::Outils::mapValue(feedback, 0.0, 1.0, settings.comb_time / 20.f, 20.);
+  settings.freeze = settings.feedback >= 1.0;
 
   return settings;
 }
@@ -183,9 +184,9 @@ HelleboreAudioProcessor::createParameterLayout() {
   layout.add(std::make_unique<FloatParam>(
       "variation", "variation", FloatRange(0.f, 1.f, 0.0001f, 0.3f), 0.1));
   layout.add(std::make_unique<FloatParam>(
-      "comb_time", "comb_time", FloatRange(0.01f, 3.9f, 0.0001f, 0.2f), 1.f));
+      "comb_time", "comb_time", FloatRange(0.01f, 3.9f, 0.0001f, 0.3f), 1.f));
   layout.add(std::make_unique<FloatParam>(
-      "rt60", "rt60", FloatRange(0.05f, 20.f, 0.1f, 1.f), 5.f));
+      "feedback", "feedback", FloatRange(0.0f, 1.0f, 0.001f, 0.5f), 0.3f));
 
   return layout;
 }

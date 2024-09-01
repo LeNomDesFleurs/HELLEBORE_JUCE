@@ -48,8 +48,8 @@ class HelleboreEditor : public juce::AudioProcessorEditor,
   juce::Slider variationSlider;
   std::unique_ptr<Attachment> variationAttachment;
 
-  juce::Slider timeSlider;
-  std::unique_ptr<Attachment> timeAttachment;
+  juce::Slider feedbackSlider;
+  std::unique_ptr<Attachment> feedbackAttachment;
 
   juce::Slider combSizeSlider;
   std::unique_ptr<Attachment> combSizeAttachement;
@@ -81,7 +81,7 @@ class HelleboreEditor : public juce::AudioProcessorEditor,
   noi::Outils::SawTooth rotationLfo{60.f, 0.03};
 
   noi::Outils::SawTooth freeze_transition{60.f, 0.3};
-  bool transition_done=false;
+  bool transition_done = false;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HelleboreEditor)
 };

@@ -16,16 +16,16 @@ juce_add_plugin(Hellebore
     #   ICON_SMALL "${CMAKE_SOURCE_DIR}/Assets/icon16.png " 
     COMPANY_NAME "NOI"                    # Specify the name of the plugin's author
     COMPANY_COPYRIGHT "NOI"
-    COMPANY_WEBSITE "https://lenomdesfleurs.github.io/Blog/"
+    COMPANY_WEBSITE "https://lndf.fr"
     COMPANY_EMAIL "Thomasvguillory@gmail.com"
     IS_SYNTH FALSE                       # Is this a synth or an effect?
     # NEEDS_MIDI_INPUT TRUE/FALSE               # Does the plugin need midi input?
     # NEEDS_MIDI_OUTPUT TRUE/FALSE              # Does the plugin need midi output?
     # IS_MIDI_EFFECT TRUE/FALSE                 # Is this plugin a MIDI effect?
     # EDITOR_WANTS_KEYBOARD_FOCUS TRUE/FALSE    # Does the editor need keyboard focus?
-    # COPY_PLUGIN_AFTER_BUILD TRUE/FALSE        # Should the plugin be installed to a default location after building?
-    PLUGIN_MANUFACTURER_CODE CCCC               # A four-character manufacturer id with at least one upper-case character
-    PLUGIN_CODE XauC                            # A unique four-character plugin id with at least one upper-case character
+    COPY_PLUGIN_AFTER_BUILD TRUE        # Should the plugin be installed to a default location after building?
+    PLUGIN_MANUFACTURER_CODE Noia            # A four-character manufacturer id with at least one upper-case character
+    PLUGIN_CODE HELL                           # A unique four-character plugin id with at least one upper-case character
     FORMATS 
     # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
             Standalone 
@@ -38,7 +38,7 @@ juce_add_plugin(Hellebore
     AU_MAIN_TYPE "kAudioUnitType_Effect"
     # AU_SANDBOX_SAFE TRUE
     # AAX_CATEGORY ""
-    # HARDENED_RUNTIME_ENABLED # macOS app settings
+    HARDENED_RUNTIME_ENABLED # macOS app settings
     # HARDENED_RUNTIME_OPTIONS
     # APP_SANDBOX_ENABLED
     # APP_SANDBOX_INHERIT

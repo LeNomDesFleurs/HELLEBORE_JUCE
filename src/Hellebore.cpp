@@ -9,15 +9,35 @@
 */
 
 #include "Hellebore.h"
+static const float MAX_COMB_SIZE = 4.f;
 
 namespace noi {
+using noi::Filter::Allpass;
+using noi::Filter::Comb;
 
-StereoMoorer::StereoMoorer(noi::StereoMoorer::Parameters parameters) {
+StereoMoorer::StereoMoorer(noi::StereoMoorer::Parameters parameters, int sample_rate)
+  : m_allpasses { {Allpass(0.006, 0.006, sample_rate), Allpass(0.006, 0.006, sample_rate)} }
+  , m_combs {{{Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate)
+              },{
+              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate)
+              }}}
+  , m_combs_status {{{0, 0, 0, 0, 0, 0},{0, 0, 0, 0, 0, 0}}}
+  , m_pan_coefs {0, 0, 0, 0, 0, 0}
+  , m_allpasses_status {0, 0}
+  , m_old_parameters {parameters}
+  , m_parameters {parameters}
+{
   updateParameters(parameters);
-  m_old_parameters = parameters;
-  std::fill(begin(m_combs_status[0]), end(m_combs_status[0]), 0.0);
-  std::fill(begin(m_combs_status[1]), end(m_combs_status[1]), 0.0);
-  std::fill(begin(m_pan_coefs), end(m_pan_coefs), 0.0);
   m_allpasses[0].setGain(0.9);
   m_allpasses[1].setGain(0.9);
 };
@@ -36,7 +56,7 @@ bool StereoMoorer::variationHaventChange() {
 }
 
 bool StereoMoorer::timeHaventChange() {
-  return m_parameters.rt60 == m_old_parameters.rt60;
+  return m_parameters.feedback == m_old_parameters.feedback;
 }
 
 bool StereoMoorer::combSizeHaventChange() {
@@ -60,11 +80,11 @@ void StereoMoorer::setPan() {
 // more variation -> more diffrence of gain between combs
 void StereoMoorer::setTime() {
   if (timeHaventChange()) return;
-  float rt60 = m_parameters.rt60;
+  float feedback = m_parameters.feedback;
   for (int i = 0; i < 2; i++) {
-    // m_allpasses[i].setGain(rt60);
+    // m_allpasses[i].setGain(feedback);
     for (int j = 0; j < 6; j++) {
-      m_combs[i][j].overrideFeedback(rt60 / 20.);
+      m_combs[i][j].overrideFeedback(feedback);
       ;
     }
   }
@@ -108,15 +128,15 @@ void StereoMoorer::setSampleRate(float sample_rate) {
 void StereoMoorer::processCombs(std::array<float, 2> inputs) {
   for (int i = 0; i < 2; i++) {
     // process combs
-    if (m_parameters.freeze) {
-      for (int j = 0; j < 6; j++) {
-        m_combs_status[i][j] = m_combs[i][j].processFreezed();
-      }
-    } else {
+    // if (m_parameters.freeze) {
+    //   for (int j = 0; j < 6; j++) {
+    //     m_combs_status[i][j] = m_combs[i][j].processFreezed();
+    //   }
+    // } else {
       for (int j = 0; j < 6; j++) {
         m_combs_status[i][j] = m_combs[i][j].process(inputs[i]);
       }
-    }
+    // }
   }
 }
 
@@ -157,8 +177,9 @@ std::array<float, 2> StereoMoorer::processStereo(std::array<float, 2> inputs) {
     //   comb_sum = (comb_sum + inputs[i]) / 2;
     //   comb_sum *= 2.0;
     // }
-    outputs[i] = ((4 * m_parameters.dry_wet) + 1) *
-                 noi::Outils::equalPowerCrossfade(inputs[i], comb_sum,
+    outputs[i] = 
+    // ((2 * m_parameters.dry_wet) + 1) *
+                 noi::Outils::equalPowerCrossfade(inputs[i], - comb_sum,
                                                   m_parameters.dry_wet);
   }
   return outputs;
