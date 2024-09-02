@@ -76,6 +76,7 @@ class HelleboreAudioProcessor : public juce::AudioProcessor
   noi::StereoMoorer::Parameters hellebore_parameters{false, 0.5F, 0.01f, 0.1f,
                                                      0.1f};
   std::optional<noi::StereoMoorer> hellebore;
+
   // std::array<float, 2> stereo_samples = { 0, 0 };
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HelleboreAudioProcessor)

@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.15)
 
+set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE)
+
 PROJECT(HELLEBORE
 LANGUAGES CXX
-VERSION 0.0.2
+VERSION 1.0.0
 )
 
 # for clang-tidy(this enable to find system header files).

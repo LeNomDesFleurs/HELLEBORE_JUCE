@@ -2,7 +2,7 @@
 
 ## To-Do
 
-- [ ] ~~Refactor Outils as an object with sample rate embedded ?~~
+- [x] ~~Refactor Outils as an object with sample rate embedded ?~~
 - [x] ~~Functional RingBuffer (all modes repitching)~~
 - [x] ~~Functional Comb~~
 - [x] ~~Functional AllPass~~ 
@@ -15,23 +15,23 @@
 - [x] getting rid of the security padding in RingBuffer.cpp ln:77
 - [x] utiliser des gradients radiaux transparent au bord pour masquer un motif background
 - [x] ajouter le logo
-- [ ] find a way to not updateStepSize once it is stable
-- [ ] Big problem, Ringbuffer s'instancie avant de recevoir son sample rate
+- [x] find a way to not updateStepSize once it is stable
+- [x] Big problem, Ringbuffer s'instancie avant de recevoir son sample rate
 - [x] try stepped repitching ?
-- [ ] adding modulation ?
-- [ ] problème dans mon pan : je somme des potentiel problème de phase, quoi que ça doit pas être très problématique puisque c'est la sortie des combs
+- [x] adding modulation ?
+- [x] problème dans mon pan : je somme des potentiel problème de phase, quoi que ça doit pas être très problématique puisque c'est la sortie des combs
 - [x] augmenter taille max des buffers
 - [ ] Gros problème de variation de volume, test à faire
 - [x] ~~Se pencher sur les histoire de edit pendant que ça run ?~~
-- [ ] default values in a header (hellebore.h?)
+- [x] default values in a header (hellebore.h?)
 - [x] augmenter size quand comb grandit (reduire amplitude) sinon pas de son quand temps faible
 - [x] en dry le son est amplifié
-- [ ] change lfo rotation speed depending on the freeze mode, rotation / aller retour
+- [x] change lfo rotation speed depending on the freeze mode, rotation / aller retour
 - [x] some kind of shaping on the panning variation effect, to sharp
-- [ ] slew harder
-- [ ] get rid of the size / feedback compensation ?
-- [ ] increase comb-time precision (especially for the loop mode)
-- [ ] freeze mode cross fade ? wait 10 or 20 more sample to get handles, then cross fade at the point of the write
+- [x] slew harder
+- [x] get rid of the size / feedback compensation ?
+- [x] increase comb-time precision (especially for the loop mode)
+- [x] freeze mode cross fade ? wait 10 or 20 more sample to get handles, then cross fade at the point of the write
 
 
 ## Segmentation fault / Assertion failure
@@ -199,21 +199,21 @@ Might as well use CPU blur such as [melatonin Blur](https://github.com/sudara/me
 
 ## UI
 
-- [ ] time as ouroboros
-  - [ ] design widget
-  - [ ] place it in the corect place
-- [ ] size
-- [ ] variation on the little dots
-- [ ] play pause
-- [ ] dry wet
-- [ ] use the correct size for background rectangles
-  - [ ] 1 Big (size)
-  - [ ] two half (time & play pause)
-  - [ ] 1 long ()
-  - [ ] 1 big
-- [ ] set the correct colors
+- [x] time as ouroboros
+  - [x] design widget
+  - [x] place it in the corect place
+- [x] size
+- [x] variation on the little dots
+- [x] play pause
+- [x] dry wet
+- [x] use the correct size for background rectangles
+  - [x] 1 Big (size)
+  - [x] two half (time & play pause)
+  - [x] 1 long ()
+  - [x] 1 big
+- [x] set the correct colors
   
-- [ ] inspect the update of the variation on the dots
+- [x] inspect the update of the variation on the dots
 
 ## widget Time
 
@@ -229,3 +229,8 @@ Parameters
   - fromRadians	the angle (clockwise) in radians at which to start the arc segment (where 0 is the top-centre of the ellipse)
   - toRadians	the angle (clockwise) in radians at which to end the arc segment (where 0 is the top-centre of the ellipse). This angle can be greater than 2*Pi, so for example to draw a curve clockwise from the 9 o'clock position to the 3 o'clock position via 12 o'clock, you'd use 1.5*Pi and 2.5*Pi as the start and finish points.
   - startAsNewSubPath	if true, the arc will begin a new subpath from its starting point; if false, it will be added to the current sub-path, continuing from the current position
+  
+
+## Crash at close
+
+order of slider and their attachement in the class header, is attachement are before, it breaks some pointer

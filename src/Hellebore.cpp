@@ -15,6 +15,8 @@ namespace noi {
 using noi::Filter::Allpass;
 using noi::Filter::Comb;
 
+
+
 StereoMoorer::StereoMoorer(noi::StereoMoorer::Parameters parameters, int sample_rate)
   : m_allpasses { {Allpass(0.006, 0.006, sample_rate), Allpass(0.006, 0.006, sample_rate)} }
   , m_combs {{{Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),

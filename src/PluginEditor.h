@@ -44,17 +44,17 @@ class HelleboreEditor : public juce::AudioProcessorEditor,
   //----------Components---------------
   BackgroundComponent background_component;
 
-  using Attachment = juce::AudioProcessorValueTreeState::SliderAttachment;
-  std::unique_ptr<Attachment> variationAttachment;
-  std::unique_ptr<Attachment> feedbackAttachment;
-  std::unique_ptr<Attachment> combSizeAttachement;
-  std::unique_ptr<Attachment> dryWetAttachement;
 
   juce::Slider variationSlider;
   juce::Slider feedbackSlider;
   juce::Slider combSizeSlider;
   juce::Slider dryWetSlider;
 
+  using Attachment = juce::AudioProcessorValueTreeState::SliderAttachment;
+  std::unique_ptr<Attachment> variationAttachment;
+  std::unique_ptr<Attachment> feedbackAttachment;
+  std::unique_ptr<Attachment> combSizeAttachement;
+  std::unique_ptr<Attachment> dryWetAttachement;
   // -----------Animation variables------------
   const int width{350};
   // entre 0 et 1
