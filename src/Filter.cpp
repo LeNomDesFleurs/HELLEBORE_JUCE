@@ -58,7 +58,7 @@ float Filter::processFreezed() { return m_buffer.readSample(); }
 
 float Allpass::process(float input) {
   float delay = m_buffer.readSample();
-  delay = noi::Outils::clipValue(delay, -1.f, 1.f);
+  // delay = noi::Outils::clipValue(delay, -1.f, 1.f);
   // float buf_in = (delay * m_gain) + input;
   // float buf_out = delay + (input * -m_gain);
   // m_buffer.writeSample(buf_in);

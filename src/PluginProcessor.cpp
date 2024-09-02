@@ -163,10 +163,9 @@ noi::StereoMoorer::Parameters getSettings(
   settings.comb_time = apvts.getRawParameterValue("comb_time")->load();
   settings.variation = apvts.getRawParameterValue("variation")->load();
   settings.feedback = apvts.getRawParameterValue("feedback")->load();
-  // minimum time grows when comb time grows to keep some minimal feedback
-  // max comb_time = 1.5 -> 1.5 * 5
-  // settings.feedback =
-      // noi::Outils::mapValue(feedback, 0.0, 1.0, settings.comb_time / 20.f, 20.);
+  // minimum feedback grows when comb feedback grows to keep some minimal
+  // feedback max comb_time = 1.5 -> 1.5 * 5 settings.feedback =
+  // noi::Outils::mapValue(feedback, 0.0, 1.0, settings.comb_time / 20.f, 20.);
   settings.freeze = settings.feedback >= 1.0;
 
   return settings;
@@ -186,7 +185,7 @@ HelleboreAudioProcessor::createParameterLayout() {
   layout.add(std::make_unique<FloatParam>(
       "comb_time", "comb_time", FloatRange(0.01f, 3.9f, 0.0001f, 0.3f), 1.f));
   layout.add(std::make_unique<FloatParam>(
-      "feedback", "feedback", FloatRange(0.0f, 1.0f, 0.001f, 0.5f), 0.3f));
+      "feedback", "feedback", FloatRange(0.0f, 1.0f, 0.001f, 2.f), 0.3f));
 
   return layout;
 }

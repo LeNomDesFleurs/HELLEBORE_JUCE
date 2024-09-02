@@ -88,7 +88,7 @@ LFO::LFO(float sampleRate, float frequence) {
 
 void LFO::phasor() {
   m_status += m_frequence / m_sample_rate;
-  if (m_status > 1) m_status = 0;
+  if (m_status > 1) m_status-= 1;
 }
 
 float TriangleWave::getNextSample() {

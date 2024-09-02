@@ -61,7 +61,7 @@ float RingBuffer::readSample() {
   }
 
   if (m_buffer_mode == freeze) {
-    m_output_sample *= noi::Outils::clipValue(1. / m_step_size, 0.2, 3.);
+    m_output_sample *= noi::Outils::clipValue(1.f / pow(m_step_size, 0.5), 0.2, 3.);
   }
   return m_output_sample;
 }
@@ -123,11 +123,7 @@ void RingBuffer::updateStepSize() {
   float step_size_goal = 1.0;
   m_actual_size = getActualSize();
   // big sample limit to account for inertia
-  if (m_actual_size > (m_size_goal - 200) &&
-      m_actual_size < (m_size_goal + 200) && new_size) {
-    // step_size_goal = 1.0;
-    new_size = false;
-  } else if ((m_actual_size > m_size_goal) && new_size) {
+ if ((m_actual_size > m_size_goal) && new_size) {
     // m_step_size = 1.5;
     step_size_goal = 2.0;
     // update the step size but with slew for clean repitch
@@ -136,9 +132,18 @@ void RingBuffer::updateStepSize() {
     step_size_goal = 0.5;
   }
 
+
   m_step_size =
       noi::Outils::slewValue(step_size_goal, m_step_size,
-                             0.9999);  // should be modified by sample rate
+                             0.999);  // should be modified by sample rate
+ if (m_actual_size > (m_size_goal - 200) &&
+      m_actual_size < (m_size_goal + 200)) {
+    if (ready_to_lock)
+    m_step_size = 1.0;
+    new_size = false;
+  } else {
+    ready_to_lock = true;
+  }
 }
 
 /// @brief Take a delay time in milliseconds, clip it within the defined max
@@ -148,8 +153,7 @@ void RingBuffer::setDelayTime(float delay_time) {
   new_size = true;
   float delay_in_samples =
       noi::Outils::convertMsToSample(delay_time, sample_rate);
-  //   adding some 4 samples padding just to be sure.
-  m_size_goal = noi::Outils::clipValue(delay_in_samples, 0, m_buffer_size - 1);
+  m_size_goal = noi::Outils::clipValue(delay_in_samples, 2000, m_buffer_size - 1);
 }
 
 void RingBuffer::setSampleRate(float _sample_rate) {

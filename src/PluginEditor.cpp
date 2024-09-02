@@ -13,16 +13,22 @@
 //==============================================================================
 HelleboreEditor::HelleboreEditor(HelleboreAudioProcessor& p,
                                  juce::AudioProcessorValueTreeState& vts)
-    : AudioProcessorEditor(&p), audioProcessor(p) {
-  const float text_box_width = 50.0f;
-  // juce::Slider comps [4]= {variationSlider, feedbackSlider, combSizeSlider,
-  // dryWetSlider};
+    : AudioProcessorEditor(&p),
+      audioProcessor(p),
+      variationWidgetLfos{{noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
+                           noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
+                           noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
+                           noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
+                           noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
+                           noi::Outils::LFO(60, 0.15f),
+                           noi::Outils::LFO(60, 0.15f)}},
+      timeWidgetLfo{60.f, 0.03} {
   apvts = &vts;
 
+  const float text_box_width = 50.0f;
   for (auto* comp : getComps()) {
     comp->setTextBoxStyle(juce::Slider::NoTextBox, false, text_box_width,
                           variationSlider.getTextBoxHeight());
-    //   comp.setSliderStyle(juce::Slider::RotaryVerticalDrag);
   }
   //------------------------------------------------------
 
@@ -59,11 +65,11 @@ HelleboreEditor::HelleboreEditor(HelleboreAudioProcessor& p,
   setSize(300, 560);
 
   // prepare lfos for the variation widget
-  int random_order[12] = {1, 5, 8, 7, 11, 3, 12, 2, 10, 6, 9, 3};
+  int random_order[12] = {1, 5, 8, 7, 11, 4, 0, 2, 10, 6, 9, 3};
 
   for (int i = 0; i < 12; i++) {
     float phase = i / 12.;
-    lfos[random_order[i]].setPhase(phase);
+    variationWidgetLfos[random_order[i]].setPhase(phase);
   }
 
   // only paint background once
@@ -81,7 +87,7 @@ HelleboreEditor::~HelleboreEditor() {
 void HelleboreEditor::paintOverChildren(juce::Graphics& g) {
   if (repaint_ui == true) {
     if (!freeze) {
-      rotation_status = rotationLfo.getNextSample() * cheappi;
+      rotation_status = timeWidgetLfo.getNextSample() * cheappi;
     }
   }
   paintVariationWidget(g);
@@ -124,8 +130,8 @@ void HelleboreEditor::parameterValueChanged(int parameterIndex,
       freeze = newValue > 0.5;
       break;
     case 3:
-      time = newValue;
-      freeze = time >= 1.0;
+      feedback = newValue;
+      freeze = feedback >= 1.0;
       break;
   }
 }
@@ -140,40 +146,39 @@ void HelleboreEditor::paintVariationWidget(juce::Graphics& g) {
   float centerx = 150;
   float centery = 375;
 
+  juce::Colour colour = CustomColors::getGradientWithoutGreen(variation);
+  colour = CustomColors::fadeToDefault(colour, dry_wet);
+  g.setColour(colour);
+
   //   float rotation[12] =
-  float distance = size * 9.0 + 1;
+  float max_base_distance = 60;
+  float max_size = 4;
+  float base_distance = (size + 0.01) * max_base_distance;
+  float elipseDiameter = (size * 10 + 4) + 0.05;
+  float elipseRadius = elipseDiameter / 2.f;
+  float variation_increment = variation / 12.f;
+  float variation_i = 0;
+  float lfo = 0;
+
   for (int i = 0; i < 12; i++) {
-    float rotation = (cheappi / 12) * i;
-    rotation += rotation_status;
-    float max_far = 10 + (i * 1.6);
+    lfo = repaint_ui && !freeze ? variationWidgetLfos[i].getNextSample()
+                                : variationWidgetLfos[i].getSample();
 
-    float lfo;
-    lfos[i].setFrequency(2 / (distance));
-    lfo = repaint_ui ? lfos[i].getNextSample() : lfos[i].getSample();
+    float angle = (lfo * 2.f) * cheappi;
+    float distance = noi::Outils::mapValue(variation_i, 0.f, 1.f, base_distance,
+                                           base_distance + 60.f * variation);
 
-    float far = (lfo * 2) * cheappi;
-    // max_far* pow(variation * 1.5, 2.0) * (lfo * 2);
+    // polar to cartesian
+    float x = (distance * cos(angle));
+    float y = (distance * sin(angle));
+    // was center on (0,0), offset to correct location + offset the radius of
+    // the circle
+    x += centerx - elipseRadius;
+    y += centery - elipseRadius;
 
-    float elipseSize = size * 10 + 4;
+    variation_i += variation_increment;
 
-    float opp = std::sin(rotation) * far;
-    float adj = std::cos(rotation) * far;
-    float x = (distance * cos(far)) - (elipseSize / 2.0);
-    float y = (distance * sin(far)) - (elipseSize / 2.0);
-
-    distance *= 1 + variation / 4.;
-    x += centerx;
-    y += centery;
-    opp += centerx;
-    adj += centery;
-    opp -= elipseSize / 2;
-    adj -= elipseSize / 2;
-    // sin theta * hypotenuse = Op
-    // cos theta * hypo = adj
-    juce::Colour colour = CustomColors::getGradientWithoutGreen(variation);
-    colour = CustomColors::fadeToDefault(colour, dry_wet);
-    g.setColour(colour);
-    g.drawEllipse(Rectangle<float>(x, y, elipseSize, elipseSize), 2.);
+    g.drawEllipse(Rectangle<float>(x, y, elipseDiameter, elipseDiameter), 2.);
   }
 }
 
@@ -183,9 +188,9 @@ void HelleboreEditor::paintTimeWidget(juce::Graphics& g) {
   float radius = 50;
 
   float bottom_offset = 0.08;
-  float offset_time = time * (1.0 - bottom_offset) + bottom_offset;
+  float offset_time = feedback * (1.0 - bottom_offset) + bottom_offset;
 
-  juce::Colour colour = CustomColors::getGradientWithoutGreen(time);
+  juce::Colour colour = CustomColors::getGradientWithoutGreen(feedback);
   colour = CustomColors::fadeToDefault(colour, dry_wet);
   g.setColour(colour);
 
@@ -219,12 +224,12 @@ void HelleboreEditor::paintSizeWidget(juce::Graphics& g) {
   float centreX = (float)x + (float)width * 0.5f;
   float centreY = (float)y + (float)height * 0.5f;
 
-  float sliderPos = size;
-  sliderPos = std::pow(sliderPos, 4);
-  sliderPos += 0.1;
-  sliderPos *= 1.3;
+  float paramValue = size;
+  paramValue = std::pow(paramValue, 3);
+  paramValue += 0.1;
+  paramValue *= 1.3;
 
-  float diameter = static_cast<float>(width) * sliderPos;
+  float diameter = static_cast<float>(width) * paramValue;
   float radius = diameter / 2.f;
 
   juce::Path p;
@@ -235,7 +240,7 @@ void HelleboreEditor::paintSizeWidget(juce::Graphics& g) {
   p.addEllipse(circlex, circley, circlew, circleh);
 
   // warning, need linear value for color gradient
-  juce::Colour colour = CustomColors::getGradientWithoutGreen(sliderPos);
+  juce::Colour colour = CustomColors::getGradientWithoutGreen(paramValue);
   colour = CustomColors::fadeToDefault(colour, dry_wet);
   g.setColour(colour);
 

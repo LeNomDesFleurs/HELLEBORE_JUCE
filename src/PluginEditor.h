@@ -42,46 +42,34 @@ class HelleboreEditor : public juce::AudioProcessorEditor,
   EmptyKnob empty_knob_look_and_feel;
 
   //----------Components---------------
-  using Attachment = juce::AudioProcessorValueTreeState::SliderAttachment;
-
   BackgroundComponent background_component;
-  juce::Slider variationSlider;
+
+  using Attachment = juce::AudioProcessorValueTreeState::SliderAttachment;
   std::unique_ptr<Attachment> variationAttachment;
-
-  juce::Slider feedbackSlider;
   std::unique_ptr<Attachment> feedbackAttachment;
-
-  juce::Slider combSizeSlider;
   std::unique_ptr<Attachment> combSizeAttachement;
-
-  juce::Slider dryWetSlider;
   std::unique_ptr<Attachment> dryWetAttachement;
 
+  juce::Slider variationSlider;
+  juce::Slider feedbackSlider;
+  juce::Slider combSizeSlider;
+  juce::Slider dryWetSlider;
+
   // -----------Animation variables------------
-  const int width = 350;
+  const int width{350};
   // entre 0 et 1
-  float variation = 0.7;
-  bool freeze = false;
-  float time = 0.25;
-  float dry_wet = 1.;
-  float size = 0.76;
-  bool repaint_ui = true;
-  float rotation_status;
+  float variation{0.5};
+  bool freeze{false};
+  float feedback{0.089};
+  float dry_wet{1.};
+  float size{0.66};
+  bool repaint_ui{true};
+  float rotation_status{};
   juce::Atomic<bool> parametersChanged{false};
 
   // animation lfos
-  std::array<noi::Outils::LFO, 12> lfos = {
-      noi::Outils::LFO(60, 0.2), noi::Outils::LFO(60, 0.2),
-      noi::Outils::LFO(60, 0.2), noi::Outils::LFO(60, 0.2),
-      noi::Outils::LFO(60, 0.2), noi::Outils::LFO(60, 0.2),
-      noi::Outils::LFO(60, 0.2), noi::Outils::LFO(60, 0.2),
-      noi::Outils::LFO(60, 0.2), noi::Outils::LFO(60, 0.2),
-      noi::Outils::LFO(60, 0.2), noi::Outils::LFO(60, 0.2)};
-
-  noi::Outils::SawTooth rotationLfo{60.f, 0.03};
-
-  noi::Outils::SawTooth freeze_transition{60.f, 0.3};
-  bool transition_done = false;
+  std::array<noi::Outils::LFO, 12> variationWidgetLfos;
+  noi::Outils::SawTooth timeWidgetLfo;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HelleboreEditor)
 };

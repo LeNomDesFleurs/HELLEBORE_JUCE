@@ -39,7 +39,7 @@ class RingBuffer {
   // wrote to first wrote
   unsigned int m_samples_for_fade{100};
   int sample_rate;
-  enum BufferMode { normal, accumulate, freeze, reverse };
+  enum BufferMode { normal, accumulate, freeze, reverse, repitch};
   BufferMode m_buffer_mode{normal};
   enum InterpolationMode { none, linear, allpass };
   InterpolationMode interpolation_mode = linear;
@@ -57,7 +57,9 @@ class RingBuffer {
   float m_actual_size{};
   float m_size_on_freeze{};
   float m_output_sample{};
+  float m_distance_to_cover{};
   bool new_size{false};
+  bool ready_to_lock{false};
   // number of sample accumulated before fading and freezing
   int accumulate_count{};
 };
