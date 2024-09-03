@@ -125,34 +125,19 @@ void HelleboreAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
 
   hellebore_parameters = getSettings(apvts);
   hellebore->updateParameters(hellebore_parameters);
-  // ringBuffer.setDelayTime(hellebore_parameters.comb_time * 1000);
 
-  // hellebore.updateParameters(hellebore_parameters);
-
-  // for (auto channel = 0; channel < buffer.getNumChannels(); ++channel) {
   // to access the sample in the channel as a C-style array
   auto LeftChannelSamples = buffer.getWritePointer(0);
   auto RightChannelSamples = buffer.getWritePointer(1);
-  // auto sample =
 
   for (auto n = 0; n < buffer.getNumSamples(); ++n) {
     std::array<float, 2> stereo_samples = {LeftChannelSamples[n],
                                            RightChannelSamples[n]};
     stereo_samples = hellebore->processStereo(stereo_samples);
 
-    // ringBuffer.writeSample(LeftChannelSamples[n]);
-
-    // LeftChannelSamples[n] = ringBuffer.readSample();
-
     LeftChannelSamples[n] = stereo_samples[0];
     RightChannelSamples[n] = stereo_samples[1];
-
-    // ringBuffer.writeSample(RightChannelSamples[n]);
-    // LeftChannelSamples[n] = LeftChannelSamples[n];
-    // RightChannelSamples[n] = ringBuffer.readSample();
   }
-
-  // }
 }
 
 noi::StereoMoorer::Parameters getSettings(
@@ -205,6 +190,9 @@ void HelleboreAudioProcessor::getStateInformation(juce::MemoryBlock& destData) {
   // You should use this method to store your parameters in the memory block.
   // You could do that either as raw data, or use the XML or ValueTree classes
   // as intermediaries to make it easy to save and load complex data.
+    auto state = apvts.copyState();
+  std::unique_ptr<juce::XmlElement> xml(state.createXml());
+  copyXmlToBinary(*xml, destData);
 }
 
 void HelleboreAudioProcessor::setStateInformation(const void* data,
@@ -212,6 +200,13 @@ void HelleboreAudioProcessor::setStateInformation(const void* data,
   // You should use this method to restore your parameters from this memory
   // block, whose contents will have been created by the getStateInformation()
   // call.
+  std::unique_ptr<juce::XmlElement> xmlState(
+      getXmlFromBinary(data, sizeInBytes));
+
+  if (xmlState.get() != nullptr)
+    if (xmlState->hasTagName(apvts.state.getType()))
+      apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
+
 }
 
 //==============================================================================

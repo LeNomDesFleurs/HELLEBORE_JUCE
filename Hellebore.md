@@ -234,3 +234,9 @@ Parameters
 ## Crash at close
 
 order of slider and their attachement in the class header, is attachement are before, it breaks some pointer
+
+## solution pour le ring buffer
+
+Data member : delay_time (sample)
+déduire le read pointer de la distance
+slewer la distance, pas le read. plus de problem d'over flow, d'incrémentation qui merdoit, tout ça tout ça

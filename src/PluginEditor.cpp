@@ -22,8 +22,8 @@ HelleboreEditor::HelleboreEditor(HelleboreAudioProcessor& p,
                            noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
                            noi::Outils::LFO(60, 0.15f),
                            noi::Outils::LFO(60, 0.15f)}},
-      timeWidgetLfo{60.f, 0.03} {
-  apvts = &vts;
+      timeWidgetLfo{60.f, 0.03},
+      apvts{&vts} {
 
   const float text_box_width = 50.0f;
   for (auto* comp : getComps()) {
@@ -85,6 +85,14 @@ HelleboreEditor::~HelleboreEditor() {
 
 //==============================================================================
 void HelleboreEditor::paintOverChildren(juce::Graphics& g) {
+  dry_wet = apvts->getRawParameterValue("dry_wet")->load();
+  size = apvts->getRawParameterValue("comb_time")->load();
+  variation = apvts->getRawParameterValue("variation")->load();
+  feedback = apvts->getRawParameterValue("feedback")->load();
+  freeze = feedback >= 1.0;
+  feedback = pow(feedback, 2);
+  size = size / 3.9f;
+
   if (repaint_ui == true) {
     if (!freeze) {
       rotation_status = timeWidgetLfo.getNextSample() * cheappi;
@@ -116,24 +124,24 @@ std::vector<juce::Slider*> HelleboreEditor::getComps() {
 
 void HelleboreEditor::parameterValueChanged(int parameterIndex,
                                             float newValue) {
-  switch (parameterIndex) {
-    case 0:
-      dry_wet = newValue;
-      break;
-    case 2:
-      size = newValue;
-      break;
-    case 1:
-      variation = newValue;
-      break;
-    case 4:
-      freeze = newValue > 0.5;
-      break;
-    case 3:
-      feedback = newValue;
-      freeze = feedback >= 1.0;
-      break;
-  }
+  // switch (parameterIndex) {
+  //   case 0:
+  //     dry_wet = newValue;
+  //     break;
+  //   case 2:
+  //     size = newValue;
+  //     break;
+  //   case 1:
+  //     variation = newValue;
+  //     break;
+  //   case 4:
+  //     freeze = newValue > 0.5;
+  //     break;
+  //   case 3:
+  //     feedback = newValue;
+  //     freeze = feedback >= 1.0;
+  //     break;
+  // }
 }
 
 void HelleboreEditor::timerCallback() {
@@ -225,7 +233,7 @@ void HelleboreEditor::paintSizeWidget(juce::Graphics& g) {
   float centreY = (float)y + (float)height * 0.5f;
 
   float paramValue = size;
-  paramValue = std::pow(paramValue, 3);
+  // paramValue = std::pow(paramValue, 3);
   paramValue += 0.1;
   paramValue *= 1.3;
 
