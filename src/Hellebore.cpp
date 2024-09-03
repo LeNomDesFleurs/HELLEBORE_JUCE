@@ -75,7 +75,7 @@ void StereoMoorer::setPan() {
   float variation = m_parameters.variation;
   for (int i = 2; i < 6; i++) {
     m_pan_coefs[i] = noi::Outils::clipValue(variation, 0.0, 1.0);
-    variation *= 1.5;
+    variation *= 1.1;
   }
 }
 
@@ -110,6 +110,7 @@ void StereoMoorer::resizeComb() {
   float variation = m_parameters.variation + 1.f;
   for (int i = 0; i < 2; i++) {
     float time = m_parameters.comb_time;
+    time = i == 1 ? time : time+(0.03*m_parameters.variation);
     for (int j = 0; j < 6; j++) {
       m_combs[i][j].resize(time);
       time += time * (variation / 10.);
