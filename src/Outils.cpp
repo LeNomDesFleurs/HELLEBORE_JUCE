@@ -76,8 +76,8 @@ float linearCrossfade(float dry, float wet, float parameter) {
 float equalPowerCrossfade(float dry, float wet, float parameter) {
   parameter = 1. - parameter;
   parameter = (parameter - 0.5) * 2;
-  float volumes_dry = std::sqrtf(0.5f * (1.f + parameter));
-  float volumes_wet = std::sqrtf(0.5f * (1.f - parameter));
+  float volumes_dry = sqrt(0.5f * (1.f + parameter));
+  float volumes_wet = sqrt(0.5f * (1.f - parameter));
   return (dry * volumes_dry) + (wet * volumes_wet);
 }
 
