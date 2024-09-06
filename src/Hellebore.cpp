@@ -44,6 +44,18 @@ StereoMoorer::StereoMoorer(noi::StereoMoorer::Parameters parameters, int sample_
   m_allpasses[1].setGain(0.9);
 };
 
+void StereoMoorer::reset(noi::StereoMoorer::Parameters parameters, int sample_rate){
+for (auto allpass : m_allpasses)
+  allpass.reset(0.006, 0.006, sample_rate);
+
+for (auto comb_channel : m_combs){
+  for (auto comb: comb_channel){
+    comb.reset(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate);
+  }
+}
+updateParameters(parameters);
+}
+
 void StereoMoorer::updateParameters(noi::StereoMoorer::Parameters parameters) {
   m_parameters = parameters;
   setTime();     // time

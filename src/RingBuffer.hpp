@@ -12,6 +12,7 @@ namespace noi {
 class RingBuffer {
  public:
   RingBuffer(float max_time, float initial_delay, int _sample_rate);
+  void reset(float max_time, float initial_delay, int _sample_rate);
   float readSample();
   void writeSample(float input_sample);
   void linearInterpolation();
@@ -39,7 +40,7 @@ class RingBuffer {
   // wrote to first wrote
   unsigned int m_samples_for_fade{100};
   int sample_rate;
-  enum BufferMode { normal, accumulate, freeze, reverse, repitch};
+  enum BufferMode { normal, accumulate, freeze, reverse, repitch };
   BufferMode m_buffer_mode{normal};
   enum InterpolationMode { none, linear, allpass };
   InterpolationMode interpolation_mode = linear;

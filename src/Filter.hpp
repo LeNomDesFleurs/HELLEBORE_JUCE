@@ -25,6 +25,7 @@ namespace Filter {
 class Filter {
  public:
   Filter(float max_time, float initial_delay, int sample_rate);
+  void reset(float max_time, float initial_delay, int sample_rate);
   void setReadSpeed(float ratio);
   void setGain(float rt60);
   void overrideFeedback(float feedback);

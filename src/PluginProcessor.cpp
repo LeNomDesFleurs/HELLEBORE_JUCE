@@ -21,9 +21,10 @@ HelleboreAudioProcessor::HelleboreAudioProcessor()
 #endif
               .withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
-      )
+              )
 #endif
-{
+      ,
+      hellebore(hellebore_parameters, 44100) {
 }
 
 HelleboreAudioProcessor::~HelleboreAudioProcessor() {}
@@ -79,7 +80,7 @@ void HelleboreAudioProcessor::changeProgramName(int index,
 //==============================================================================
 void HelleboreAudioProcessor::prepareToPlay(double sampleRate,
                                             int samplesPerBlock) {
-  hellebore = noi::StereoMoorer(hellebore_parameters, (int)sampleRate);
+  hellebore.reset(hellebore_parameters, (int)sampleRate);
   // Use this method as the place to do any pre-playback
   // initialisation that you need..
 }
@@ -124,19 +125,29 @@ void HelleboreAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
     buffer.clear(i, 0, buffer.getNumSamples());
 
   hellebore_parameters = getSettings(apvts);
-  hellebore->updateParameters(hellebore_parameters);
+  hellebore.updateParameters(hellebore_parameters);
 
-  // to access the sample in the channel as a C-style array
-  auto LeftChannelSamples = buffer.getWritePointer(0);
-  auto RightChannelSamples = buffer.getWritePointer(1);
+  if (totalNumInputChannels == 2) {
+    // to access the sample in the channel as an array
+    auto LeftChannelSamples = buffer.getWritePointer(0);
+    auto RightChannelSamples = buffer.getWritePointer(1);
 
-  for (auto n = 0; n < buffer.getNumSamples(); ++n) {
-    std::array<float, 2> stereo_samples = {LeftChannelSamples[n],
-                                           RightChannelSamples[n]};
-    stereo_samples = hellebore->processStereo(stereo_samples);
+    for (auto n = 0; n < buffer.getNumSamples(); ++n) {
+      std::array<float, 2> stereo_samples = {LeftChannelSamples[n],
+                                             RightChannelSamples[n]};
+      stereo_samples = hellebore.processStereo(stereo_samples);
 
-    LeftChannelSamples[n] = stereo_samples[0];
-    RightChannelSamples[n] = stereo_samples[1];
+      LeftChannelSamples[n] = stereo_samples[0];
+      RightChannelSamples[n] = stereo_samples[1];
+    }
+  } else {
+    auto LeftChannelSamples = buffer.getWritePointer(0);
+    for (auto n = 0; n < buffer.getNumSamples(); ++n) {
+      std::array<float, 2> stereo_samples = {LeftChannelSamples[n], 0.f};
+      stereo_samples = hellebore.processStereo(stereo_samples);
+
+      LeftChannelSamples[n] = stereo_samples[0];
+    }
   }
 }
 
@@ -190,7 +201,7 @@ void HelleboreAudioProcessor::getStateInformation(juce::MemoryBlock& destData) {
   // You should use this method to store your parameters in the memory block.
   // You could do that either as raw data, or use the XML or ValueTree classes
   // as intermediaries to make it easy to save and load complex data.
-    auto state = apvts.copyState();
+  auto state = apvts.copyState();
   std::unique_ptr<juce::XmlElement> xml(state.createXml());
   copyXmlToBinary(*xml, destData);
 }
@@ -206,7 +217,6 @@ void HelleboreAudioProcessor::setStateInformation(const void* data,
   if (xmlState.get() != nullptr)
     if (xmlState->hasTagName(apvts.state.getType()))
       apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
-
 }
 
 //==============================================================================

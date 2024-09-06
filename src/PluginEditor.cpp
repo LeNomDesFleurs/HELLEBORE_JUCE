@@ -22,7 +22,7 @@ HelleboreEditor::HelleboreEditor(HelleboreAudioProcessor& p,
                            noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
                            noi::Outils::LFO(60, 0.15f),
                            noi::Outils::LFO(60, 0.15f)}},
-      timeWidgetLfo{60.f, 0.03},
+      timeWidgetLfo(60.f, 0.2),
       apvts{&vts} {
 
   const float text_box_width = 50.0f;

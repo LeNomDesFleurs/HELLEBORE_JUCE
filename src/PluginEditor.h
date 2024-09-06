@@ -69,7 +69,7 @@ class HelleboreEditor : public juce::AudioProcessorEditor,
 
   // animation lfos
   std::array<noi::Outils::LFO, 12> variationWidgetLfos;
-  noi::Outils::SawTooth timeWidgetLfo;
+  noi::Outils::LFO timeWidgetLfo;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(HelleboreEditor)
 };

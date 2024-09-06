@@ -81,10 +81,10 @@ float equalPowerCrossfade(float dry, float wet, float parameter) {
   return (dry * volumes_dry) + (wet * volumes_wet);
 }
 
-LFO::LFO(float sampleRate, float frequence) {
-  m_sample_rate = sampleRate;
-  m_frequence = frequence;
-}
+LFO::LFO(float sampleRate, float frequence) 
+: m_sample_rate {sampleRate}
+, m_frequence {frequence}
+{}
 
 void LFO::phasor() {
   m_status += m_frequence / m_sample_rate;

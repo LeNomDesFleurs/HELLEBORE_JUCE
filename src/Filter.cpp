@@ -23,6 +23,11 @@ Filter::Filter(float max_time, float initial_delay, int sample_rate)
   , m_looptime {max_time}
 {}
 
+void Filter::reset(float max_time, float initial_delay, int sample_rate){
+  m_buffer.reset(max_time, initial_delay, sample_rate);
+  m_looptime = max_time;
+}
+
 void Filter::setReadSpeed(float ratio) { m_buffer.setStepSize(ratio); }
 
 /// @brief Define the time needed to loose 60 dB

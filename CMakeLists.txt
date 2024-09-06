@@ -1,10 +1,13 @@
 cmake_minimum_required(VERSION 3.15)
 
+if (APPLE)
 set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "" FORCE)
+message("-- Compiling fat Binaries on macos")
+endif()
 
 PROJECT(HELLEBORE
 LANGUAGES CXX
-VERSION 1.0.0
+VERSION 1.0.1
 )
 
 # for clang-tidy(this enable to find system header files).

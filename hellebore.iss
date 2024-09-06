@@ -1,6 +1,6 @@
 [Setup]
 AppName=Hellebore
-AppVersion=1.0.0
+AppVersion=1.0.1
 DefaultDirName={commoncf64}
 DefaultGroupName=Hellebore
 OutputBaseFilename=Hellebore-windows

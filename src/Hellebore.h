@@ -42,6 +42,7 @@ class StereoMoorer {
     float dry_wet, comb_time, variation, feedback;
   };
   StereoMoorer(noi::StereoMoorer::Parameters parameters, int sample_rate);
+  void reset(noi::StereoMoorer::Parameters parameters, int sample_rate);
   bool variationHaventChange();
   bool timeHaventChange();
   bool combSizeHaventChange();

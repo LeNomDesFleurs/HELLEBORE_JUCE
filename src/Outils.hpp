@@ -54,7 +54,7 @@ float equalPowerCrossfade(float dry, float wet, float parameter);
 
 class LFO {
  public:
-  float m_status;
+  float m_status{};
   float m_sample_rate;
   float m_frequence;
 

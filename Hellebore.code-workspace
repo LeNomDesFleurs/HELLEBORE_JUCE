@@ -17,6 +17,7 @@
         "C_Cpp.intelliSenseEngine": "default",
         "C_Cpp.default.cppStandard": "c++17",
         "cmake.buildDirectory": "${workspaceFolder}/build",
+        "cmake.debugConfig": {},
         "git.ignoreLimitWarning": true,
         "clangd.arguments": [
             "-clang-tidy",

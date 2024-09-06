@@ -240,3 +240,12 @@ order of slider and their attachement in the class header, is attachement are be
 Data member : delay_time (sample)
 déduire le read pointer de la distance
 slewer la distance, pas le read. plus de problem d'over flow, d'incrémentation qui merdoit, tout ça tout ça
+
+## DEBUGGING
+
+feedback lfo sometimes not working
+problem comes from sample rate / buffer modification
+it calls prepareToPlay which does n'importe quoi with the buffer
+rewrite everything with init method to set the sample rate
+**FIXED**
+auvaltool also check for usage in mono, should accept working with only one channel
