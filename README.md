@@ -1,5 +1,9 @@
-# VST Plugin hacking concepts of Delay Line Reverberation Algorithm
+# Hellebore Is An Audio Plugin Based On Delay Lines
 
-Stereo reverb alowing big buffer size
+It is a group of feedback loops. 
+You manage the size of these loops and the amount of feedback. 
+Going from reverberation to granular effect. 
+Using the maximum feedback freezes the buffers, allowing the repitch and glitch of their content. 
 
-1 allpass in series with 6 paralell comb (moorer kind) 
+
+[You can download it here](https://lndf.fr/NOI/Hellebore.html)
