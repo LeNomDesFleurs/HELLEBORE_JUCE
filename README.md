@@ -7,3 +7,5 @@ Using the maximum feedback freezes the buffers, allowing the repitch and glitch 
 
 
 [You can download it here](https://lndf.fr/NOI/Hellebore.html)
+
+[More info to build it yourself](https://github.com/LeNomDesFleurs/HELLEBORE_JUCE/wiki/Building)
