@@ -18,26 +18,26 @@ using noi::Filter::Comb;
 
 
 StereoMoorer::StereoMoorer(noi::StereoMoorer::Parameters parameters, int sample_rate)
-  : m_allpasses { {Allpass(0.006, 0.006, sample_rate), Allpass(0.006, 0.006, sample_rate)} }
-  , m_combs {{{Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
-              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
-              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
-              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
-              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
-              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate)
-              },{
-              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
-              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
-              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
-              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
-              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
-              Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate)
-              }}}
-  , m_combs_status {{{0, 0, 0, 0, 0, 0},{0, 0, 0, 0, 0, 0}}}
-  , m_pan_coefs {0, 0, 0, 0, 0, 0}
-  , m_allpasses_status {0, 0}
-  , m_old_parameters {parameters}
-  , m_parameters {parameters}
+: m_combs {{{Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+    Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+    Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+    Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+    Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+    Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate)
+},{
+    Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+    Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+    Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+    Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+    Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate),
+    Comb(MAX_COMB_SIZE, MAX_COMB_SIZE / 2.f, sample_rate)
+}}}
+, m_allpasses { {Allpass(0.006, 0.006, sample_rate), Allpass(0.006, 0.006, sample_rate)} }
+, m_parameters {parameters}
+, m_old_parameters {parameters}
+, m_allpasses_status {0, 0}
+, m_combs_status {{{0, 0, 0, 0, 0, 0},{0, 0, 0, 0, 0, 0}}}
+, m_pan_coefs {0, 0, 0, 0, 0, 0}
 {
   updateParameters(parameters);
   m_allpasses[0].setGain(0.9);
@@ -110,9 +110,9 @@ void StereoMoorer::setFreeze() {
     for (int j = 0; j < 6; j++) {
       m_combs[i][j].setFreeze(m_parameters.freeze);
     }
-    for (auto& allpases : m_allpasses) {
+//    for (auto& allpases : m_allpasses) {
       // allpases.setFreeze(m_parameters.freeze);
-    }
+//    }
   }
 }
 

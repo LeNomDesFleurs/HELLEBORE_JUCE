@@ -45,7 +45,7 @@ void DryWetLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y,
                                         juce::Slider& slider)
 //! [drawRotarySlider]
 {
-  auto radius = (float)juce::jmin(width / 2, width / 2) - 10.0f;
+//  auto radius = (float)juce::jmin(width / 2, width / 2) - 10.0f;
   auto centreX = (float)width * (float)sliderPos * 0.9;
   auto centreY = (float)height/2.f;
   

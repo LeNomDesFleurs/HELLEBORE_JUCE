@@ -63,7 +63,7 @@ void BackgroundComponent::paint(juce::Graphics& g) {
 
   // Title color
   g.setColour(CustomColors::pink);
-  g.setFont(juce::Font("Times New Roman", 60.0f, juce::Font::italic));
+    g.setFont(juce::FontOptions("Times New Roman", 60.0f, juce::Font::italic));
   g.drawFittedText("Hellebore", 0, -10, 300, 80,
                    juce::Justification::centred, 1);
 
@@ -93,7 +93,7 @@ juce::Path BackgroundComponent::paintMotif(int size_x, int size_y,
     for (int j = 0; j < size_y; j += block_size) {
       int horizontal_distance = pow(void_centerx - i, 2);
       int vertical_distance = pow(void_centery - j, 2);
-      int total_distance = sqrt(horizontal_distance + vertical_distance);
+//      int total_distance = sqrt(horizontal_distance + vertical_distance);
 
       // if (total_distance > 150) {
       if (dis(gen) > 0.5) {

@@ -8,7 +8,7 @@
 #include "BackgroundComponent.hpp"
 #include "LookAndFeel.hpp"
 #include "PluginProcessor.h"
-#include "demoComponent.h"
+//#include "demoComponent.h"
 
 class HelleboreEditor : public juce::AudioProcessorEditor,
                         public juce::AudioProcessorParameter::Listener,

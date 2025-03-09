@@ -15,15 +15,15 @@ HelleboreEditor::HelleboreEditor(HelleboreAudioProcessor& p,
                                  juce::AudioProcessorValueTreeState& vts)
     : AudioProcessorEditor(&p),
       audioProcessor(p),
-      variationWidgetLfos{{noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
-                           noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
-                           noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
-                           noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
-                           noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
-                           noi::Outils::LFO(60, 0.15f),
-                           noi::Outils::LFO(60, 0.15f)}},
-      timeWidgetLfo(60.f, 0.2),
-      apvts{&vts} {
+apvts{&vts},
+variationWidgetLfos{{noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
+    noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
+    noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
+    noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
+    noi::Outils::LFO(60, 0.15f), noi::Outils::LFO(60, 0.15f),
+    noi::Outils::LFO(60, 0.15f),
+    noi::Outils::LFO(60, 0.15f)}},
+timeWidgetLfo(60.f, 0.2) {
 
   const float text_box_width = 50.0f;
   for (auto* comp : getComps()) {
@@ -160,7 +160,7 @@ void HelleboreEditor::paintVariationWidget(juce::Graphics& g) {
 
   //   float rotation[12] =
   float max_base_distance = 60;
-  float max_size = 4;
+//  float max_size = 4;
   float base_distance = (size + 0.01) * max_base_distance;
   float elipseDiameter = (size * 10 + 4) + 0.05;
   float elipseRadius = elipseDiameter / 2.f;

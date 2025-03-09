@@ -7,11 +7,11 @@ namespace noi {
 /// @param initial_delay in seconds
 RingBuffer::RingBuffer(float max_time, float initial_delay, int _sample_rate)
     : sample_rate{_sample_rate},
-      m_write{(int)(initial_delay * (float)sample_rate)},
-      m_actual_size{(float)m_write},
-      m_crossfade_buffer(m_samples_for_fade, 0),
-      m_buffer(max_time * (float)sample_rate, 0),
-      m_buffer_size{(int)m_buffer.size() - 1} {}
+m_buffer(max_time * (float)sample_rate, 0),
+m_crossfade_buffer(m_samples_for_fade, 0),
+m_write{(int)(initial_delay * (float)sample_rate)},
+m_buffer_size{(int)m_buffer.size() - 1},
+m_actual_size{(float)m_write} {}
 
 void RingBuffer::reset(float max_time, float initial_delay, int _sample_rate) {
   sample_rate = _sample_rate;
